@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shallebs Agency | Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="logo.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/activity.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+        <nav class="sidebar">
+            <div class="logo">
+                <h2 style="font-size: 1.5rem; letter-spacing: 1px; margin-bottom: 2px;">SHALLEBS</h2>
+                <span style="font-size: 0.75rem; opacity: 0.8; letter-spacing: 0.5px; text-transform: uppercase;">Travel & Agency</span>
+            </div>
+
+            <ul class="nav-links">
+                <li class="active" onclick="showSection('dashboard-section')">
+                    <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                </li>
+                <li onclick="showSection('add-client-section')">
+                    <i class="fas fa-user-plus"></i> <span>Add Client</span>
+                </li>
+                <li onclick="showSection('database-section')">
+                    <i class="fas fa-database"></i> <span>Client Database</span>
+                </li>
+                <li onclick="showSection('workers-section')">
+                    <i class="fas fa-id-badge"></i> <span>Workers</span>
+                </li>
+                <li onclick="showSection('finance-section')">
+                    <i class="fas fa-wallet"></i> <span>Finance</span>
+                </li>
+                <li onclick="showSection('transactions-section')">
+                    <i class="fas fa-file-invoice-dollar"></i> <span>Transaction Log</span>
+                </li>
+                <li onclick="showSection('expenses-section')">
+                    <i class="fas fa-receipt"></i> <span>Expenses</span>
+                </li>
+                <li onclick="showSection('tasks-section')">
+                    <i class="fas fa-tasks"></i> <span>Daily Tasks</span>
+                </li>
+                <li onclick="showSection('profile-section')">
+                    <i class="fas fa-user-circle"></i> <span>My Profile</span>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <p>Logged in as: Admin</p>
+                <button onclick="logout()" style="background: none; border: 1px solid white; color: white; cursor: pointer; padding: 5px 10px; margin-top: 10px; border-radius: 5px;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </nav>
+
+        <main class="content">
+            <header class="main-header">
+                <div class="search-bar-placeholder"></div>
+                <div class="header-right-actions" style="display: flex; align-items: center; gap: 20px;">
+                    <div class="admin-profile-widget" onclick="showSection('profile-section')" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <img id="header-avatar" src="https://ui-avatars.com/api/?name=Admin&background=1a237e&color=fff" alt="Admin" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                        <span id="header-admin-name" style="font-weight: 600; font-size: 0.9rem; color: #1e293b;">Admin</span>
+                    </div>
+                    <div class="notifications" onclick="toggleNotifs()">
+                        <i class="fas fa-bell"></i>
+                        <span id="notif-count" class="badge" style="display:none;">0</span>
+                        
+                        <div id="notif-dropdown" class="notif-dropdown modern-notif-dropdown" style="display:none;" onclick="event.stopPropagation()">
+                            <div class="notif-header">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <h4 style="margin: 0; color: #1e293b; font-size: 1.15rem;">Notifications</h4>
+                                    <button onclick="document.getElementById('notif-dropdown').style.display='none'; event.stopPropagation();" style="background: none; border: none; font-size: 1.1rem; color: #94a3b8; cursor: pointer; padding: 4px; border-radius: 4px; transition: 0.2s;" onmouseover="this.style.color='#ef4444'; this.style.backgroundColor='#fee2e2';" onmouseout="this.style.color='#94a3b8'; this.style.backgroundColor='transparent';">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="notif-filters" style="display: flex; gap: 8px;">
+                                    <button class="notif-filter-btn active" onclick="filterNotifications('unread', event)">Unread</button>
+                                    <button class="notif-filter-btn" onclick="filterNotifications('read', event)">Read</button>
+                                    <button class="notif-filter-btn" onclick="filterNotifications('all', event)">All</button>
+                                </div>
+                            </div>
+                            <div id="notif-items" class="notif-body">
+                                <!-- Alerts injected here -->
+                            </div>
+                        </div>
+                </div>
+            </header>
+
+            <div id="dashboard-section" class="section">
+                <div class="dashboard-header-flex">
+                    <h1 id="dashboard-greeting">Agency Command Center</h1>
+                    <div class="live-status-pill">
+                        <span class="pulse-dot"></span> Live Agency Data
+                    </div>
+                </div>
+                
+                <div class="stats-grid command-center-stats">
+                    <div class="stat-card premium-finance counter-card">
+                        <div class="stat-header">
+                            <i class="fas fa-coins"></i>
+                            <span>Total Revenue</span>
+                        </div>
+                        <p id="stat-revenue" class="animate-count">KES 0</p>
+                        <small>Payments received</small>
+                    </div>
+                    <div class="stat-card premium-pending counter-card">
+                        <div class="stat-header">
+                            <i class="fas fa-clock"></i>
+                            <span>Projected Revenue</span>
+                        </div>
+                        <p id="stat-projected" class="animate-count">KES 0</p>
+                        <small>Outstanding balances</small>
+                    </div>
+                    <div class="stat-card premium-tasks counter-card">
+                        <div class="stat-header">
+                            <i class="fas fa-user-check"></i>
+                            <span>Visa Success</span>
+                        </div>
+                        <p id="stat-success-rate">98%</p>
+                        <small>Historical average</small>
+                    </div>
+                    <div class="stat-card premium-profit counter-card">
+                        <div class="stat-header">
+                            <i class="fas fa-users"></i>
+                            <span>New Clients</span>
+                        </div>
+                        <p id="stat-new-clients" class="animate-count">0</p>
+                        <small>This month</small>
+                    </div>
+                    <div class="stat-card premium-expenses counter-card">
+                        <div class="stat-header">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Avg. Charge</span>
+                        </div>
+                        <p id="stat-avg-charge" class="animate-count">KES 0</p>
+                        <small>Per client average</small>
+                    </div>
+                    <div class="stat-card" style="border-left-color: #7b1fa2;">
+                        <div class="stat-header">
+                            <i class="fas fa-percentage" style="color:#7b1fa2;"></i>
+                            <span>Collection Rate</span>
+                        </div>
+                        <p id="stat-collection-rate" style="color:#7b1fa2;">0%</p>
+                        <small>Paid vs. total due</small>
+                    </div>
+                </div>
+
+                <!-- Revenue Trend Chart with Filters -->
+                <div class="chart-container-main" style="margin-bottom: 25px;">
+                    <div class="chart-top-bar">
+                        <h3><i class="fas fa-chart-line"></i> Revenue Trend</h3>
+                        <div class="chart-filter-bar">
+                            <button class="chart-filter-btn active" onclick="updateRevenueTrend('monthly', this)">Monthly</button>
+                            <button class="chart-filter-btn" onclick="updateRevenueTrend('quarterly', this)">Quarterly</button>
+                            <button class="chart-filter-btn" onclick="updateRevenueTrend('yearly', this)">Yearly</button>
+                        </div>
+                    </div>
+                    <canvas id="revenueTrendChart"></canvas>
+                </div>
+
+                <div class="command-center-layout">
+                    <div class="main-analytics">
+                        <div class="dashboard-charts-row">
+                        <div class="chart-container-main">
+                            <div class="chart-top-bar">
+                                <h3><i class="fas fa-filter"></i> Application Pipeline</h3>
+                            </div>
+                            <canvas id="pipelineFunnelChart"></canvas>
+                        </div>
+                        </div>
+                        <div class="dashboard-charts-row">
+                            <div class="chart-container-half">
+                                <h3><i class="fas fa-chart-line"></i> Performance Trend</h3>
+                                <canvas id="financeGrowthChart"></canvas>
+                            </div>
+                            <div class="chart-container-half">
+                                <div class="chart-top-bar">
+                                    <h3><i class="fas fa-map-marker-alt"></i> Destination Heatmap</h3>
+                                </div>
+                                <canvas id="destinationHeatmapChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="global-activity-sidebar">
+                        <h3><i class="fas fa-history"></i> Agency Live Feed</h3>
+                        <div id="global-activity-feed" class="activity-feed">
+                            <div class="loader-inner">Fetching logs...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="finance-section" class="section" style="display:none;">
+                <div class="section-header">
+                    <h1>Finance Overview</h1>
+                    <p>Track your agency's financial health, profit, and latest revenue.</p>
+                    <div class="export-btn-group" style="margin-left: auto;">
+                        <button class="export-btn" onclick="exportFinancePDF()">
+                            <i class="fas fa-file-pdf"></i> Export PDF
+                        </button>
+                        <button class="export-btn export-btn-excel" onclick="exportFinanceExcel()">
+                            <i class="fas fa-file-excel"></i> Export Excel
+                        </button>
+                    </div>
+                </div>
+
+                <div class="finance-stats-grid">
+                    <div class="finance-stat-card">
+                        <div class="finance-stat-top">
+                            <div class="finance-icon" style="background: #e8f5e9; color: #4caf50;">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <span class="trend-pill trend-up"><i class="fas fa-arrow-up"></i> +12.5%</span>
+                        </div>
+                        <p class="finance-stat-title">Total Revenue</p>
+                        <h2 id="finance-page-revenue">KES 0</h2>
+                    </div>
+                    
+                    <div class="finance-stat-card">
+                        <div class="finance-stat-top">
+                            <div class="finance-icon" style="background: #ffebee; color: #f44336;">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                            <span class="trend-pill trend-down"><i class="fas fa-arrow-down"></i> -2.4%</span>
+                        </div>
+                        <p class="finance-stat-title">Total Expenses</p>
+                        <h2 id="finance-page-expenses">KES 0</h2>
+                    </div>
+
+                    <div class="finance-stat-card">
+                        <div class="finance-stat-top">
+                            <div class="finance-icon" style="background: #e3f2fd; color: #2196f3;">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <span class="trend-pill trend-up"><i class="fas fa-arrow-up"></i> +5.1%</span>
+                        </div>
+                        <p class="finance-stat-title">Net Profit</p>
+                        <h2 id="finance-page-profit">KES 0</h2>
+                    </div>
+
+                    <div class="finance-stat-card">
+                        <div class="finance-stat-top">
+                            <div class="finance-icon" style="background: #fff3e0; color: #ff9800;">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <p class="finance-stat-title">Outstanding Balance</p>
+                        <h2 id="finance-page-outstanding">KES 0</h2>
+                    </div>
+                </div>
+
+                <div class="finance-charts-layout">
+                    <div class="finance-chart-main">
+                        <div class="chart-top-bar">
+                            <h3>Cashflow Overview</h3>
+                            <select id="cashflow-filter" class="clean-select">
+                                <option>Last 12 Months</option>
+                                <option>Last 30 Days</option>
+                            </select>
+                        </div>
+                        <canvas id="financeCashflowChart" height="250"></canvas>
+                    </div>
+                    
+                    <div class="finance-chart-side">
+                        <div class="chart-top-bar">
+                            <h3>Expense Breakdown</h3>
+                        </div>
+                        <div class="doughnut-container">
+                            <canvas id="financeExpenseDoughnut" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="finance-bottom-layout">
+                    <div class="finance-transactions">
+                        <div class="chart-top-bar">
+                            <h3>Recent Transactions</h3>
+                            <button class="btn-text" onclick="showSection('transactions-section')">View All <i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <table class="premium-table">
+                            <thead>
+                                <tr>
+                                    <th>Client Name</th>
+                                    <th>Payment Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="finance-recent-transactions">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="transactions-section" class="section" style="display:none;">
+                <div class="section-header">
+                    <h1>Global Transaction Log</h1>
+                    <div style="display:flex; align-items:center; gap:12px; margin-left:auto;">
+                        <div class="search-box">
+                            <input type="text" id="transactionSearch" placeholder="Search client name..." onkeyup="filterTransactions()">
+                        </div>
+                        <div class="export-btn-group">
+                            <button class="export-btn" onclick="exportTransactionsCSV()">
+                                <i class="fas fa-file-csv"></i> CSV
+                            </button>
+                            <button class="export-btn export-btn-excel" onclick="exportTransactionsExcel()">
+                                <i class="fas fa-file-excel"></i> Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="premium-table" id="allTransactionsTable">
+                        <thead>
+                            <tr>
+                                <th>Client Name</th>
+                                <th>Payment Date</th>
+                                <th>Amount Paid</th>
+                                <th>Status / Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="all-transactions-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="expenses-section" class="section" style="display:none;">
+                <div class="section-header">
+                    <h1>Expense Management</h1>
+                    <button class="btn-action-primary" onclick="showExpenseForm()">
+                        <i class="fas fa-plus"></i> Log New Expense
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card premium-expenses">
+                        <div class="stat-header">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <span>Total Expenses</span>
+                        </div>
+                        <p id="stat-total-expenses">KES 0</p>
+                        <small>Cumulative spending</small>
+                    </div>
+                    <div class="stat-card premium-profit">
+                        <div class="stat-header">
+                            <i class="fas fa-hand-holding-usd"></i>
+                            <span>Net Profit</span>
+                        </div>
+                        <p id="stat-net-profit">KES 0</p>
+                        <small>Revenue after all expenses</small>
+                    </div>
+                </div>
+
+                <div class="dashboard-charts-row">
+                    <div class="chart-container-half">
+                        <h3><i class="fas fa-chart-pie"></i> Category Breakdown</h3>
+                        <canvas id="expenseCategoryChart"></canvas>
+                    </div>
+                    <div class="chart-container-half">
+                        <h3><i class="fas fa-chart-bar"></i> Monthly Trend</h3>
+                        <canvas id="expenseTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <h3>Recent Expense Log</h3>
+                    <table id="expensesTable">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="profile-section" class="section" style="display:none;">
+                <div class="section-header">
+                    <h1>Admin Profile</h1>
+                    <p>Manage your account settings and profile picture.</p>
+                </div>
+
+                <div class="profile-container">
+                    <div class="profile-card">
+                        <div class="avatar-upload-container">
+                            <div class="avatar-preview">
+                                <img id="profile-avatar" src="https://ui-avatars.com/api/?name=Admin&background=1a237e&color=fff&size=120" alt="Avatar">
+                                <div class="avatar-overlay" onclick="document.getElementById('avatar-upload').click()">
+                                    <i class="fas fa-camera"></i>
+                                    <span>Change</span>
+                                </div>
+                            </div>
+                            <input type="file" id="avatar-upload" style="display:none;" accept="image/*" onchange="uploadAvatar(event)">
+                        </div>
+                        
+                        <form id="profile-form" class="shallebs-form" style="max-width: 100%; box-shadow: none; padding: 0; margin-top: 30px;">
+                            <div class="form-group">
+                                <label>Display Name</label>
+                                <input type="text" id="profile-name" required placeholder="Loading...">
+                            </div>
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" id="profile-email" readonly style="background: #f1f5f9; cursor: not-allowed;" title="Email cannot be changed here">
+                                <small style="color: #64748b; margin-top: 5px; display: block;">Contact technical support to change primary login email.</small>
+                            </div>
+                            <button type="submit" class="btn-save" style="margin-top: 20px;">Save Profile Updates</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="add-client-section" class="section" style="display:none;">
+                <div class="form-page-header">
+                    <h1><i class="fas fa-user-plus"></i> New Client Registration</h1>
+                    <p>Enter the details below to onboard a new client to Shallebs Agency.</p>
+                </div>
+                
+                <div class="form-card-container">
+                    <form id="client-form" class="modern-client-form">
+                        <div class="form-section-title">Personal Information</div>
+                        <div class="form-grid">
+                            <div class="form-group modern">
+                                <label><i class="fas fa-user"></i> Full Name</label>
+                                <input type="text" id="full_name" required placeholder="e.g. John Doe">
+                            </div>
+                            <div class="form-group modern">
+                                <label><i class="fas fa-phone-alt"></i> Phone Number</label>
+                                <input type="text" id="phone_number" required placeholder="+254 7...">
+                            </div>
+                            <div class="form-group modern">
+                                <label><i class="fas fa-venus-mars"></i> Gender</label>
+                                <div class="select-wrapper">
+                                    <select id="gender">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down select-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-divider"></div>
+                        <div class="form-section-title">Travel & Documentation</div>
+
+                        <div class="form-grid">
+                            <div class="form-group modern">
+                                <label><i class="fas fa-passport"></i> Passport Number</label>
+                                <input type="text" id="passport_number" required placeholder="Enter passport no.">
+                            </div>
+                            <div class="form-group modern">
+                                <label><i class="far fa-calendar-alt"></i> Passport Expiry Date</label>
+                                <input type="date" id="passport_expiry" required>
+                            </div>
+                            <div class="form-group modern">
+                                <label><i class="fas fa-plane-departure"></i> Destination</label>
+                                <input type="text" id="destination" placeholder="e.g. Canada, UK, Australia">
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancel" onclick="document.getElementById('client-form').reset()"><i class="fas fa-undo"></i> Clear Form</button>
+                            <button type="submit" class="btn-submit-modern"><i class="fas fa-save"></i> Register Client</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="database-section" class="section" style="display:none;">
+    <div class="section-header">
+        <h1>Client Database</h1>
+    </div>
+
+    <div class="table-container">
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label>Destination</label>
+                <select id="filter-destination" onchange="fetchClients()">
+                    <option value="All">All Countries</option>
+                    <option value="Canada">Canada</option>
+                    <option value="UK">UK</option>
+                    <option value="USA">USA</option>
+                    <option value="Australia">Australia</option>
+                    <option value="Qatar">Qatar</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Visa Status</label>
+                <select id="filter-status" onchange="fetchClients()">
+                    <option value="All">All Statuses</option>
+                    <option value="Client Acceptance">Client Acceptance</option>
+                    <option value="Documentation">Documentation</option>
+                    <option value="Preview Submission">Preview Submission</option>
+                    <option value="Visa Status">Visa Status</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Search Name/Passport</label>
+                <input type="text" id="filter-search" placeholder="Type to search..." onkeyup="fetchClients()">
+            </div>
+        </div>
+
+        <table id="clientsTable">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Passport No.</th>
+                    <th>Contact</th>
+                    <th>Destination</th>
+                    <th>Registered</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="clientsTableBody">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+            <div id="expense-modal" class="modal" style="display:none;">
+                <div class="modal-content small-modal">
+                    <div class="modal-header">
+                        <h2>Record New Expense</h2>
+                        <span class="close-modal" onclick="closeExpenseModal()">&times;</span>
+                    </div>
+                    <form id="expense-form" class="shallebs-form">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="exp-category" required>
+                                <option value="Rent">Rent</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Salary">Salary</option>
+                                <option value="Documentation">Documentation</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount (KES)</label>
+                            <input type="number" id="exp-amount" required placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <input type="text" id="exp-desc" placeholder="e.g. March Office Rent">
+                        </div>
+                        <button type="submit" class="btn-save">Log Expense</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="tasks-section" class="section" style="display:none;">
+                <div class="section-header">
+                    <h1>Active Follow-ups</h1>
+                    <p>Things that need to be done today.</p>
+                </div>
+
+                <div class="stats-grid command-center-stats" style="margin-bottom: 25px;">
+                    <div class="stat-card premium-tasks counter-card">
+                        <div class="stat-header">
+                            <i class="fas fa-list-ul"></i>
+                            <span>Active Tasks</span>
+                        </div>
+                        <p id="stat-active-tasks" class="animate-count">0</p>
+                        <small>Currently pending</small>
+                    </div>
+                    <div class="stat-card premium-pending counter-card" style="border-left-color: #d32f2f;">
+                        <div class="stat-header">
+                            <i class="fas fa-exclamation-triangle" style="color:#d32f2f;"></i>
+                            <span>Overdue Tasks</span>
+                        </div>
+                        <p id="stat-overdue-tasks" style="color:#d32f2f;" class="animate-count">0</p>
+                        <small>Requires immediate action</small>
+                    </div>
+                    <div class="stat-card premium-finance counter-card">
+                        <div class="stat-header">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Completion Rate</span>
+                        </div>
+                        <p id="stat-task-completion">0%</p>
+                        <small>All time</small>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="tasksTable">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Destination</th>
+                                <th>Action Required</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasksTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="workers-section" class="section" style="display:none;">
+                <div class="section-header">
+                    <h1>Worker Management</h1>
+                    <p>Manage agency staff and assign them to client documentation.</p>
+                </div>
+                
+                <div class="form-card-container" style="margin-top: 20px;">
+                    <form id="worker-form" class="modern-client-form">
+                        <div class="form-section-title">Add New Worker</div>
+                        <div class="form-grid" style="grid-template-columns: 1fr auto; align-items: end;">
+                            <div class="form-group modern" style="margin-bottom: 0;">
+                                <label><i class="fas fa-user-tie"></i> Full Name</label>
+                                <input type="text" id="worker_full_name" required placeholder="e.g. Calleb">
+                            </div>
+                            <button type="submit" class="btn-submit-modern" style="margin-bottom: 0;"><i class="fas fa-plus"></i> Add Worker</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container" style="margin-top: 30px;">
+                    <table class="shallebs-table">
+                        <thead>
+                            <tr>
+                                <th>Worker Name</th>
+                                <th>Date Added</th>
+                                <th>Active Workload</th>
+                                <th>Total Assigned</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workers-body">
+                            <tr><td colspan="3" style="text-align:center; padding: 20px;">Loading workers...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="details-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detail-name">Client Name</h2>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+
+            <div class="modal-body-container">
+                <div class="modal-sidebar">
+                    <button class="tab-btn active" onclick="switchTab('finance', event)">💰 Finance</button>
+                    <button class="tab-btn" onclick="switchTab('status', event)">🚀 Status</button>
+                    <button class="tab-btn" onclick="switchTab('docs', event)">📂 Documents</button>
+                    <button class="tab-btn" onclick="switchTab('tasks', event)">📝 Tasks</button>
+                    <hr>
+                    <button class="tab-btn" style="color: #d32f2f;" onclick="switchTab('activity', event)">📜 View Activity Log</button>
+                </div>
+
+                <div id="modal-workspace" class="modal-main-view">
+                    <!-- Content dynamically loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Worker Workload Modal -->
+    <div id="worker-workload-modal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-tasks"></i> Worker Workload: <span id="workload-worker-name"></span></h2>
+                <span class="close-modal" onclick="document.getElementById('worker-workload-modal').style.display='none'">&times;</span>
+            </div>
+            
+            <div class="form-grid" style="grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px; margin-top: 15px;">
+                <div class="filter-group" style="background: #f8fafc; padding: 15px; border-radius: 8px; display: flex; gap: 10px; align-items: flex-end;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.85rem; font-weight: 600; color: #1e293b; margin-bottom: 5px; display: block;">Assign New Client</label>
+                        <select id="workload-assign-select" class="clean-select" style="width: 100%;">
+                            <option value="">Select an unassigned client...</option>
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                    <button class="btn-action-primary" onclick="assignClientFromModal()" style="white-space: nowrap; padding: 10px 20px;">
+                        <i class="fas fa-plus"></i> Assign
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="shallebs-table">
+                    <thead>
+                        <tr>
+                            <th>Client Name</th>
+                            <th>Current Status</th>
+                            <th>Date Assigned</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="worker-assigned-clients-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/activity.js"></script>
+    <script src="js/clients.js"></script>
+    <script src="js/documents.js"></script>
+    <script src="js/finance.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/workers.js"></script>
+</body>
+
+</html>
