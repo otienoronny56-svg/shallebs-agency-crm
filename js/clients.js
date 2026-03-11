@@ -232,6 +232,29 @@ window.switchTab = function(tabName, event) {
         fetchClientFinance(currentClientId);
         
     } else if (tabName === 'status') {
+        const _allWorkers = window._allWorkers || [];
+        
+        let currentLead = currentClientData?.assigned_worker || '';
+        if (currentLead.includes(' (Team:')) {
+            currentLead = currentLead.split(' (Team:')[0];
+        }
+
+        const leadOptionsHtml = _allWorkers.map(w => {
+            return `<option value="${w.full_name}" ${currentLead === w.full_name ? 'selected' : ''}>${w.full_name}</option>`;
+        }).join('');
+
+        let membersStr = '';
+        if (currentClientData?.assigned_worker && currentClientData.assigned_worker.includes(' (Team:')) {
+            membersStr = currentClientData.assigned_worker.split('(Team: ')[1].replace(')', '');
+        }
+        const membersArray = membersStr.split(', ').filter(Boolean);
+
+        const memberOptionsHtml = _allWorkers.map(w => {
+            return `<option value="${w.full_name}" ${membersArray.includes(w.full_name) ? 'selected' : ''}>${w.full_name}</option>`;
+        }).join('');
+
+        const status = currentClientData?.status || '';
+
         workspace.innerHTML = `
             <div class="status-manager">
                 <div class="vault-header">
@@ -258,26 +281,12 @@ window.switchTab = function(tabName, event) {
                         <label style="font-size: 0.8rem; font-weight: bold; color: #64748b;">Team Lead</label>
                         <select id="worker-assignment-dropdown" class="modern-select" style="width: 100%; margin-bottom: 10px;">
                             <option value="">-- Unassigned --</option>
-                            ${(window._allWorkers || []).map(w => {
-                                // Extract lead from currentClientData if it has " (Team:"
-                                let currentLead = currentClientData.assigned_worker || '';
-                                if (currentLead.includes(' (Team:')) {
-                                    currentLead = currentLead.split(' (Team:')[0];
-                                }
-                                return `<option value="${w.full_name}" ${currentLead === w.full_name ? 'selected' : ''}>${w.full_name}</option>`;
-                            }).join('')}
+                            ${leadOptionsHtml}
                         </select>
 
                         <label style="font-size: 0.8rem; font-weight: bold; color: #64748b;">Team Members (Ctrl/Cmd+Click to select multiple)</label>
                         <select id="team-members-dropdown" class="modern-select" multiple style="width: 100%; height: 80px; margin-bottom: 15px;">
-                            ${(window._allWorkers || []).map(w => {
-                                let membersStr = '';
-                                if (currentClientData.assigned_worker && currentClientData.assigned_worker.includes(' (Team:')) {
-                                    membersStr = currentClientData.assigned_worker.split('(Team: ')[1].replace(')', '');
-                                }
-                                const membersArray = membersStr.split(', ').filter(Boolean);
-                                return `<option value="${w.full_name}" ${membersArray.includes(w.full_name) ? 'selected' : ''}>${w.full_name}</option>`;
-                            }).join('')}
+                            ${memberOptionsHtml}
                         </select>
 
                         <button class="btn-action-primary" onclick="assignWorkerToClient()" style="padding: 10px 20px; font-size: 0.9rem; width: 100%;">Save Team Assignment</button>
@@ -285,17 +294,17 @@ window.switchTab = function(tabName, event) {
                 </div>
 
                 <div class="status-pipeline" style="margin-top: 25px; display: flex; flex-wrap: wrap; gap: 8px;">
-                    <div class="pipeline-step ${currentClientData.status === 'Client Acceptance' ? 'active' : ''}">Acceptance</div>
+                    <div class="pipeline-step ${status === 'Client Acceptance' ? 'active' : ''}">Acceptance</div>
                     <div class="pipeline-arrow"><i class="fas fa-chevron-right"></i></div>
-                    <div class="pipeline-step ${currentClientData.status === 'Documentation' ? 'active' : ''}">Docs</div>
+                    <div class="pipeline-step ${status === 'Documentation' ? 'active' : ''}">Docs</div>
                     <div class="pipeline-arrow"><i class="fas fa-chevron-right"></i></div>
-                    <div class="pipeline-step ${currentClientData.status === 'Preview Submission' ? 'active' : ''}">Preview</div>
+                    <div class="pipeline-step ${status === 'Preview Submission' ? 'active' : ''}">Preview</div>
                     <div class="pipeline-arrow"><i class="fas fa-chevron-right"></i></div>
-                    <div class="pipeline-step ${currentClientData.status === 'Visa Status' ? 'active' : ''}">Visa</div>
+                    <div class="pipeline-step ${status === 'Visa Status' ? 'active' : ''}">Visa</div>
                     <div class="pipeline-arrow"><i class="fas fa-chevron-right"></i></div>
-                    <div class="pipeline-step ${currentClientData.status === 'Processing' ? 'active' : ''}">Processing</div>
+                    <div class="pipeline-step ${status === 'Processing' ? 'active' : ''}">Processing</div>
                     <div class="pipeline-arrow"><i class="fas fa-chevron-right"></i></div>
-                    <div class="pipeline-step ${currentClientData.status === 'Completed' ? 'active' : ''}">Completed</div>
+                    <div class="pipeline-step ${status === 'Completed' ? 'active' : ''}">Completed</div>
                 </div>
             </div>
         `;
