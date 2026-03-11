@@ -111,12 +111,19 @@ document.getElementById('login-form')?.addEventListener('submit', async (e) => {
 async function checkUser() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     
-    // If on index.html and NOT logged in, kick them back to login
-    if (!user && window.location.pathname.includes('index.html')) {
+    const currentPath = window.location.pathname;
+    const isDashboard = currentPath.includes('index.html') || currentPath === '/' || currentPath.endsWith('/shallebs-agency/');
+    const isLoginPage = currentPath.includes('login.html');
+
+    if (!user && isDashboard) {
         window.location.href = 'login.html';
-    } else if (user && window.location.pathname.includes('index.html')) {
+    } else if (user && isLoginPage) {
+        window.location.href = 'index.html';
+    } else if (user && isDashboard) {
         // Load User Profile Data
         loadUserProfile(user);
+        // Reveal the body now that auth is confirmed
+        document.body.style.display = 'block';
     }
 }
 
@@ -239,10 +246,13 @@ window.uploadAvatar = async function(event) {
     }
 };
 
-// Run check on load and pre-load dashboard data immediately
-if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
-    checkUser().then(() => {
-        // Pre-load dashboard data as soon as the page is ready
+// Run check on load globally
+checkUser().then(() => {
+    // Only pre-load dashboard data if we are actually on the dashboard
+    const currentPath = window.location.pathname;
+    const isDashboard = currentPath.includes('index.html') || currentPath === '/' || currentPath.endsWith('/shallebs-agency/');
+    
+    if (isDashboard) {
         if (typeof window.loadDashboardStats === 'function') {
             window.loadDashboardStats();
         } else {
@@ -253,8 +263,8 @@ if (window.location.pathname.includes('index.html') || window.location.pathname 
                 }
             });
         }
-    });
-}
+    }
+});
 
 // 3. Logout Function
 window.logout = async function() {
