@@ -48,8 +48,6 @@
                 <li onclick="showSection('expenses-section')">
                     <i class="fas fa-receipt"></i> <span>Expenses</span>
                 </li>
-                    <i class="fas fa-receipt"></i> <span>Expenses</span>
-                </li>
                 <li onclick="showSection('profile-section')">
                     <i class="fas fa-user-circle"></i> <span>My Profile</span>
                 </li>
@@ -93,9 +91,112 @@
                                 <!-- Alerts injected here -->
                             </div>
                         </div>
+                    </div>
                 </div>
             </header>
 
+            <div id="dashboard-section" class="section">
+                <div class="dashboard-header-flex">
+                    <h1 id="dashboard-greeting">Agency Command Center</h1>
+                    <div class="live-status-pill">
+                        <span class="pulse-dot"></span> Live Agency Data
+                    </div>
+                </div>
+                
+                <div class="stats-grid command-center-stats">
+                    <div class="stat-card premium-finance counter-card">
+                        <div class="stat-header">
+                            <i class="fas fa-coins"></i>
+                            <span>Total Revenue</span>
+                        </div>
+                        <p id="stat-revenue" class="animate-count">KES 0</p>
+                        <small>Payments received</small>
+                    </div>
+                    <div class="stat-card premium-pending counter-card">
+                        <div class="stat-header">
+                            <i class="fas fa-clock"></i>
+                            <span>Projected Revenue</span>
+                        </div>
+                        <p id="stat-projected" class="animate-count">KES 0</p>
+                        <small>Outstanding balances</small>
+                    </div>
+                    <div class="stat-card premium-tasks counter-card">
+                        <div class="stat-header">
+                            <i class="fas fa-user-check"></i>
+                            <span>Visa Success</span>
+                        </div>
+                        <p id="stat-success-rate">98%</p>
+                        <small>Historical average</small>
+                    </div>
+                    <div class="stat-card premium-profit counter-card">
+                        <div class="stat-header">
+                            <i class="fas fa-users"></i>
+                            <span>New Clients</span>
+                        </div>
+                        <p id="stat-new-clients" class="animate-count">0</p>
+                        <small>This month</small>
+                    </div>
+                    <div class="stat-card premium-expenses counter-card">
+                        <div class="stat-header">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Avg. Charge</span>
+                        </div>
+                        <p id="stat-avg-charge" class="animate-count">KES 0</p>
+                        <small>Per client average</small>
+                    </div>
+                    <div class="stat-card" style="border-left-color: #7b1fa2;">
+                        <div class="stat-header">
+                            <i class="fas fa-percentage" style="color:#7b1fa2;"></i>
+                            <span>Collection Rate</span>
+                        </div>
+                        <p id="stat-collection-rate" style="color:#7b1fa2;">0%</p>
+                        <small>Paid vs. total due</small>
+                    </div>
+                </div>
+
+                <!-- Revenue Trend Chart with Filters -->
+                <div class="chart-container-main" style="margin-bottom: 25px;">
+                    <div class="chart-top-bar">
+                        <h3><i class="fas fa-chart-line"></i> Revenue Trend</h3>
+                        <div class="chart-filter-bar">
+                            <button class="chart-filter-btn active" onclick="updateRevenueTrend('monthly', this)">Monthly</button>
+                            <button class="chart-filter-btn" onclick="updateRevenueTrend('quarterly', this)">Quarterly</button>
+                            <button class="chart-filter-btn" onclick="updateRevenueTrend('yearly', this)">Yearly</button>
+                        </div>
+                    </div>
+                    <canvas id="revenueTrendChart"></canvas>
+                </div>
+
+                <div class="command-center-layout">
+                    <div class="main-analytics">
+                        <div class="dashboard-charts-row">
+                            <div class="chart-container-main">
+                                <div class="chart-top-bar">
+                                    <h3><i class="fas fa-filter"></i> Application Pipeline</h3>
+                                </div>
+                                <canvas id="pipelineFunnelChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="dashboard-charts-row">
+                            <div class="chart-container-half">
+                                <h3><i class="fas fa-chart-line"></i> Performance Trend</h3>
+                                <canvas id="financeGrowthChart"></canvas>
+                            </div>
+                            <div class="chart-container-half">
+                                <div class="chart-top-bar">
+                                    <h3><i class="fas fa-map-marker-alt"></i> Destination Heatmap</h3>
+                                </div>
+                                <canvas id="destinationHeatmapChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="global-activity-sidebar">
+                        <h3><i class="fas fa-history"></i> Agency Live Feed</h3>
+                        <div id="global-activity-feed" class="activity-feed">
+                            <div class="loader-inner">Fetching logs...</div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Merged Finance Section -->
@@ -204,7 +305,12 @@
                 </div>
             </div>
 
-
+            <div id="transactions-section" class="section" style="display:none;">
+                <div class="section-header">
+                    <button onclick="showSection('dashboard-section')" class="btn-back" style="margin-right: 15px; background: #f1f5f9; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: #1e293b; font-weight: 600;">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                    <h1>Global Transaction Log</h1>
                     <div style="display:flex; align-items:center; gap:12px; margin-left:auto;">
                         <div class="search-box">
                             <input type="text" id="transactionSearch" placeholder="Search client name..." onkeyup="filterTransactions()">
