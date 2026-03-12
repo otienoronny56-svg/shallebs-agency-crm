@@ -708,22 +708,21 @@ window.generateReceipt = function(clientName, amount, balance) {
 
 
                 .agency-info {
-                    flex-grow: 1;
-                    margin-left: 25px;
+                    text-align: right;
                 }
 
                 .agency-info h1 {
-                    color: var(--primary);
-                    font-size: 22px;
-                    font-weight: 800;
-                    margin-bottom: 4px;
-                    letter-spacing: -0.5px;
+                    font-size: 26px;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    margin: 0;
                 }
 
                 .agency-details {
-                    color: var(--text-light);
-                    font-size: 12px;
-                    line-height: 1.5;
+                    color: #add8e6;
+                    font-size: 14px;
+                    font-weight: 500;
+                    margin-top: 5px;
                 }
 
                 .receipt-meta {
@@ -900,7 +899,7 @@ window.generateReceipt = function(clientName, amount, balance) {
                     <div class="agency-info">
                         <h1>
                             <span style="color: #add8e6;">SHALLEBS</span> 
-                            <span style="color: #fb8c00; opacity: 0.6;">TRAVEL AGENCY</span>
+                            <span style="color: #fb8c00;">TRAVEL AGENCY</span>
                         </h1>
                         <div class="agency-details">
                             <p>HAZINA TOWERS 16<sup>TH</sup> FLOOR</p>
