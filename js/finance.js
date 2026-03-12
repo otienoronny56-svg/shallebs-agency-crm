@@ -699,18 +699,13 @@ window.generateReceipt = function(clientName, amount, balance) {
 
                 .header {
                     display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    border-bottom: 2px solid var(--primary);
-                    padding-bottom: 25px;
-                    margin-bottom: 40px;
+                    justify-content: flex-end;
+                    border-bottom: 2px solid #add8e6;
+                    padding-bottom: 15px;
+                    margin-bottom: 30px;
                 }
 
-                .logo-container img {
-                    width: 100px;
-                    height: auto;
-                    display: block;
-                }
+
 
                 .agency-info {
                     flex-grow: 1;
@@ -902,20 +897,15 @@ window.generateReceipt = function(clientName, amount, balance) {
             
             <div class="a4-container">
                 <div class="header">
-                    <div class="logo-container">
-                        <img src="logo.jpg" alt="Shallebs Agency Logo">
-                    </div>
                     <div class="agency-info">
                         <h1>
-                            <span style="color: #039be5;">SHALLEBS</span> 
-                            <span style="color: #fb8c00;">TRAVEL AGENCY</span>
+                            <span style="color: #add8e6;">SHALLEBS</span> 
+                            <span style="color: #fb8c00; opacity: 0.6;">TRAVEL AGENCY</span>
                         </h1>
-                        <p style="font-size: 11px; color: #039be5; font-style: italic; margin-bottom: 10px; margin-top: -5px;">"....explore the new World with us"</p>
                         <div class="agency-details">
-                            <p>16th Floor, Hazina Towers</p>
-                            <p>Utalii Street, Nairobi, Kenya</p>
-                            <p>Phone: 0722 418 493 / 0722 543 551</p>
-                            <p>Email: info@shallebstravelagency.co.ke</p>
+                            <p>HAZINA TOWERS 16<sup>TH</sup> FLOOR</p>
+                            <p>TELL: 0722 418 493</p>
+                            <p>info@shallebstravelagency.co.ke</p>
                         </div>
                     </div>
                     <div class="receipt-meta">
