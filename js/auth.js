@@ -10,38 +10,70 @@ window.supabase = supabaseClient;
 // Handle the client registration form submission
 const clientForm = document.getElementById('client-form');
 if (clientForm) {
+    let isSubmitting = false; // Submission lock
+
     clientForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        console.log('Submitting new client...');
+        
+        if (isSubmitting) return; // Prevent double submission
+        
+        const submitBtn = clientForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        
+        try {
+            isSubmitting = true;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
+            
+            console.log('Submitting new client...');
 
-        const full_name = document.getElementById('full_name').value;
-        const phone_number = document.getElementById('phone_number').value;
-        const passport_number = document.getElementById('passport_number').value;
-        const registration_date = document.getElementById('registration_date').value;
-        const gender = document.getElementById('gender').value;
-        const destination_country = document.getElementById('destination').value;
+            const full_name = document.getElementById('full_name').value;
+            const phone_number = document.getElementById('phone_number').value;
+            const passport_number = document.getElementById('passport_number').value;
+            const registration_date = document.getElementById('registration_date').value;
+            const gender = document.getElementById('gender').value;
+            const destination_country = document.getElementById('destination').value;
 
-        // the clients table uses a column named destination_country (and has a status field)
-        const { data, error } = await supabaseClient
-            .from('clients')
-            .insert([{ full_name, phone_number, passport_number, registration_date, gender, destination_country, status: 'new' }]);
+            // the clients table uses a column named destination_country (and has a status field)
+            // Added .select() to ensure data is returned for activity logging
+            const { data, error } = await supabaseClient
+                .from('clients')
+                .insert([{ full_name, phone_number, passport_number, registration_date, gender, destination_country, status: 'new' }])
+                .select();
 
-        if (error) {
-            console.error('Error saving client:', error);
-            alert('Failed to save client. See console for details.');
-            return;
+            if (error) {
+                console.error('Error saving client:', error);
+                
+                // Handle common 409 Conflict / Unique Constraint Violation
+                if (error.code === '23505') {
+                    alert(`Conflict: A client with this Passport Number or Phone Number already exists in the database.`);
+                } else {
+                    alert(`Failed to save client: ${error.message || 'Unknown error'}`);
+                }
+                return;
+            }
+
+            alert('Client saved successfully!');
+            
+            // Log the activity
+            if (data && data.length > 0) {
+                const newClientId = data[0].id;
+                logActivity(newClientId, 'Client Created', `New client ${full_name} registered`);
+            }
+            
+            // clear form
+            clientForm.reset();
+            // optionally go to database view
+            showSection('database-section');
+            
+        } catch (err) {
+            console.error('Unexpected error during registration:', err);
+            alert('An unexpected error occurred. Please check your connection and try again.');
+        } finally {
+            isSubmitting = false;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
         }
-
-        alert('Client saved successfully!');
-        // Log the activity
-        if (data && data.length > 0) {
-            const newClientId = data[0].id;
-            logActivity(newClientId, 'Client Created', `New client ${full_name} registered`);
-        }
-        // clear form
-        clientForm.reset();
-        // optionally go to database view
-        showSection('database-section');
     });
 }
 
@@ -77,7 +109,7 @@ window.showSection = function(sectionId) {
     });
 
     // Load tasks when tasks-section is shown
-    } else if (sectionId === 'tasks-section') {
+    if (sectionId === 'tasks-section') {
         if (typeof window.loadAllTasks === 'function') {
             window.loadAllTasks();
         }
@@ -186,6 +218,15 @@ function loadUserProfile(user) {
     const subGreeting = document.getElementById('dashboard-sub-greeting');
     if (subGreeting) {
         subGreeting.innerText = `Welcome back! Here's your agency's financial overview for today.`;
+    }
+
+    const tasksGreeting = document.getElementById('tasks-greeting');
+    if (tasksGreeting) {
+        tasksGreeting.innerHTML = `${greeting}, ${firstName} <span style="font-size: 0.9em; margin-left: 6px;">${emoji}</span>`;
+    }
+    const tasksSub = document.getElementById('tasks-sub-greeting');
+    if (tasksSub) {
+        tasksSub.innerText = `Focus on your priorities! Here are your active follow-ups for today.`;
     }
 
     // Update Profile Section

@@ -34,7 +34,7 @@
                     <i class="fas fa-tasks"></i> <span>Daily Tasks</span>
                 </li>
                 <li onclick="showSection('dashboard-section')">
-                    <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                    <i class="fas fa-th-large"></i> <span>Finance</span>
                 </li>
                 <li onclick="showSection('add-client-section')">
                     <i class="fas fa-user-plus"></i> <span>Add Client</span>
@@ -106,6 +106,32 @@
                     </div>
                 </div>
                 
+                <!-- GLOBAL DASHBOARD FILTERS -->
+                <div class="dashboard-filters" style="display: flex; gap: 15px; margin-bottom: 25px; align-items: center; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); flex-wrap: wrap;">
+                    <div class="filter-group" style="margin: 0;">
+                        <label style="font-size: 0.8rem; color: #64748b; margin-bottom: 4px; display: block;">Time Period</label>
+                        <select id="global-date-filter" onchange="toggleCustomDateInputs(); applyDashboardFilters()" style="padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; outline: none; background: #f8fafc; font-size: 0.9rem; min-width: 150px; color: #1e293b; font-weight: 500;">
+                            <option value="all">All Time</option>
+                            <option value="this_month">This Month</option>
+                            <option value="past_6_months">Past 6 Months</option>
+                            <option value="this_year">This Year</option>
+                            <option value="custom">Custom Range...</option>
+                        </select>
+                    </div>
+                    
+                    <div id="custom-date-group" style="display: none; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <div class="filter-group" style="margin: 0;">
+                            <label style="font-size: 0.8rem; color: #64748b; margin-bottom: 4px; display: block;">Start Date</label>
+                            <input type="date" id="global-start-date" style="padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; outline: none; background: #f8fafc; font-size: 0.9rem; color: #1e293b;">
+                        </div>
+                        <div class="filter-group" style="margin: 0;">
+                            <label style="font-size: 0.8rem; color: #64748b; margin-bottom: 4px; display: block;">End Date</label>
+                            <input type="date" id="global-end-date" style="padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; outline: none; background: #f8fafc; font-size: 0.9rem; color: #1e293b;">
+                        </div>
+                        <button onclick="applyDashboardFilters()" class="btn-action-primary" style="margin-top: 18px; padding: 8px 15px; height: 38px;"><i class="fas fa-filter"></i> Apply</button>
+                    </div>
+                </div>
+
                 <div class="stats-grid command-center-stats">
                     <div class="stat-card premium-finance counter-card">
                         <div class="stat-header">
@@ -577,11 +603,11 @@
                 </div>
             </div>
 
-            <div id="tasks-section" class="section">
-                <div class="section-header">
+            <div id="tasks-section" class="section" style="padding-top: 5px;">
+                <div class="section-header" style="margin-bottom: 25px;">
                     <div>
-                        <h1>Active Follow-ups</h1>
-                        <p>Things that need to be done today.</p>
+                        <h1 id="tasks-greeting" style="font-size: 1.5rem; margin-bottom: 4px;">Active Follow-ups</h1>
+                        <p id="tasks-sub-greeting" style="color: #64748b; font-size: 0.95rem;">Things that need to be done today.</p>
                     </div>
                     <button class="btn-action-primary" onclick="openQuickTaskModal()" style="margin-left: auto;">
                         <i class="fas fa-plus-circle"></i> Create New Task

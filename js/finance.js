@@ -151,57 +151,143 @@ function toggleLoader(containerId, show) {
     }
 }
 
+// --- Global Data Cache ---
+let _allClientsCached = [];
+let _allPaymentsCached = [];
+let _allExpensesCached = [];
+let _allLogsCached = [];
+
+// --- Filter UI Logic ---
+window.toggleCustomDateInputs = function() {
+    const filter = document.getElementById('global-date-filter').value;
+    const customGroup = document.getElementById('custom-date-group');
+    if (customGroup) {
+        customGroup.style.display = (filter === 'custom') ? 'flex' : 'none';
+    }
+};
+
+window.applyDashboardFilters = async function() {
+    // We re-run the layout loaders which now use the filter values
+    const currentSection = document.querySelector('.section:not([style*="display: none"])')?.id;
+    
+    // Refresh whatever is currently visible
+    if (typeof window.loadDashboardStats === 'function') await window.loadDashboardStats();
+    if (typeof window.loadFinanceDashboard === 'function') await window.loadFinanceDashboard();
+};
+
+function getDashboardDateRange() {
+    const filter = document.getElementById('global-date-filter')?.value || 'all';
+    const startInput = document.getElementById('global-start-date')?.value;
+    const endInput = document.getElementById('global-end-date')?.value;
+    
+    let start = null;
+    let end = new Date(); // Default end is now
+    
+    if (filter === 'this_month') {
+        start = new Date();
+        start.setDate(1);
+        start.setHours(0, 0, 0, 0);
+    } else if (filter === 'past_6_months') {
+        start = new Date();
+        start.setMonth(start.getMonth() - 6);
+        start.setHours(0, 0, 0, 0);
+    } else if (filter === 'this_year') {
+        start = new Date(new Date().getFullYear(), 0, 1);
+        start.setHours(0, 0, 0, 0);
+    } else if (filter === 'custom') {
+        if (startInput) start = new Date(startInput);
+        if (endInput) {
+            end = new Date(endInput);
+            end.setHours(23, 59, 59, 999);
+        }
+    }
+    
+    return { start, end };
+}
+
+function filterDataByDate(data, dateKey, start, end) {
+    if (!start && !end) return data;
+    return data.filter(item => {
+        const itemDate = new Date(item[dateKey]);
+        if (isNaN(itemDate)) return true; // Keep items with invalid dates if any
+        if (start && itemDate < start) return false;
+        if (end && itemDate > end) return false;
+        return true;
+    });
+}
+
 // --- Command Center Logic ---
 window.loadDashboardStats = async function() {
     toggleLoader('dashboard-section', true);
     
-    // 1. Fetch all data IN PARALLEL (much faster than sequential awaits)
-    const [paymentsRes, clientsRes] = await Promise.all([
+    // Fetch all required data
+    const [paymentsRes, clientsRes, logsRes] = await Promise.all([
         supabaseClient.from('payments').select('*'),
-        supabaseClient.from('clients').select('*')
+        supabaseClient.from('clients').select('*'),
+        supabaseClient.from('activity_logs').select('*').eq('event_type', 'Payment')
     ]);
 
-    const payments = paymentsRes.data || [];
-    const clients = clientsRes.data || [];
+    _allPaymentsCached = paymentsRes.data || [];
+    _allClientsCached = clientsRes.data || [];
+    _allLogsCached = logsRes.data || [];
 
-    // Build a lookup: client_id → created_at date for chart grouping
-    const clientDateMap = {};
-    clients.forEach(c => { if (c.id) clientDateMap[c.id] = c.created_at; });
+    const { start, end } = getDashboardDateRange();
+    
+    // Filter data for stats and charts
+    const filteredPayments = filterDataByDate(_allPaymentsCached, 'created_at', start, end);
+    const filteredClients = filterDataByDate(_allClientsCached, 'created_at', start, end);
+    const filteredLogs = filterDataByDate(_allLogsCached, 'created_at', start, end);
 
-    // Enrich payments with client's registration date (used for trend chart)
-    const enrichedPayments = payments.map(p => ({
-        ...p,
-        created_at: p.created_at || clientDateMap[p.client_id] || null
-    }));
-    _cachedPayments = enrichedPayments; // Cache for filter re-renders
+    // Prepare revenue data from logs (for trend chart)
+    const revenueEntries = filteredLogs.map(log => {
+        const amountMatch = log.description.match(/KES ([\d,.]+)/);
+        return {
+            amount_paid: amountMatch ? parseFloat(amountMatch[1].replace(/,/g, '')) : 0,
+            created_at: log.created_at
+        };
+    });
+    _cachedPayments = revenueEntries; 
 
     // 2. Calculate Totals
     let totalRevenue = 0;
     let totalProjected = 0;
-    payments?.forEach(p => {
-        totalRevenue += parseFloat(p.amount_paid || 0);
+    
+    // Revenue from logs for accuracy
+    revenueEntries.forEach(r => totalRevenue += r.amount_paid);
+    
+    // Projected from payments table
+    filteredPayments.forEach(p => {
         totalProjected += (parseFloat(p.total_amount_due || 0) - parseFloat(p.amount_paid || 0));
     });
 
     // 3. New Clients this month
     const startOfMonth = new Date();
     startOfMonth.setDate(1);
-    const newClientsMonth = clients?.filter(c => new Date(c.created_at) >= startOfMonth).length || 0;
+    const newClientsMonth = _allClientsCached.filter(c => new Date(c.created_at) >= startOfMonth).length || 0;
 
-    // 4. Visa Success Rate Calculation
-    const completed = clients?.filter(c => c.status === 'Completed').length || 0;
-    const processing = clients?.filter(c => c.status === 'Visa Processing').length || 0;
-    const successRate = completed + processing > 0 
-        ? Math.round((completed / (completed + (processing * 0.1))) * 100)
-        : 98;
+    // 4. Visa Success Rate (Fully Dynamic)
+    const completed = _allClientsCached.filter(c => c.status === 'Completed').length || 0;
+    const processing = _allClientsCached.filter(c => ['Visa Processing', 'Visa Status', 'Documentation'].includes(c.status)).length || 0;
+    const failed = _allClientsCached.filter(c => c.status === 'Failed').length || 0; // Assuming 'Failed' status could exist
+    
+    const totalProcessed = completed + failed;
+    const successRate = totalProcessed > 0 
+        ? Math.round((completed / totalProcessed) * 100)
+        : (completed > 0 ? 100 : 0); // No failures yet = 100% if we have completions
+        
     const successEl = document.getElementById('stat-success-rate');
-    if (successEl) successEl.innerText = `${successRate}%`;
+    if (successEl) {
+        successEl.innerText = `${successRate || 0}%`;
+        // Add a small tooltip-like text if no data
+        if (totalProcessed === 0 && completed === 0) successEl.innerText = "N/A";
+    }
 
     // 5. Average Charge & Collection Rate
-    const totalDue = payments?.reduce((sum, p) => sum + parseFloat(p.total_amount_due || 0), 0) || 0;
-    const uniqueClientIds = new Set(payments?.map(p => p.client_id).filter(Boolean));
+    const totalDue = filteredPayments.reduce((sum, p) => sum + parseFloat(p.total_amount_due || 0), 0) || 0;
+    const uniqueClientIds = new Set(filteredPayments.map(p => p.client_id).filter(Boolean));
     const avgCharge = uniqueClientIds.size > 0 ? Math.round(totalDue / uniqueClientIds.size) : 0;
-    const collectionRate = totalDue > 0 ? Math.round((totalRevenue / totalDue) * 100) : 0;
+    const collectionRate = totalDue > 0 ? Math.round((totalRevenue / (totalRevenue + totalProjected)) * 100) : 0;
+    
     animateValue("stat-avg-charge", 0, avgCharge, 1200, "KES ");
     const collEl = document.getElementById('stat-collection-rate');
     if (collEl) collEl.innerText = `${collectionRate}%`;
@@ -211,11 +297,11 @@ window.loadDashboardStats = async function() {
     animateValue("stat-projected", 0, totalProjected, 1500, "KES ");
     animateValue("stat-new-clients", 0, newClientsMonth, 1000);
     
-    // 7. Render Charts (all at once)
-    renderRevenueTrendChart('monthly'); // Default view
-    renderFinanceCharts(payments || []);
-    renderPipelineChart(clients || []);
-    renderDestinationHeatmap(clients || []);
+    // 7. Render Charts
+    renderRevenueTrendChart('monthly'); 
+    renderFinanceCharts(revenueEntries);
+    renderPipelineChart(filteredClients);
+    renderDestinationHeatmap(filteredClients);
     
     // 8. Global Activity
     if (window.renderGlobalActivityFeed) renderGlobalActivityFeed();
@@ -435,7 +521,7 @@ function renderFinanceCharts(payments) {
     if (!ctx) return;
 
     const dataPoints = payments.slice(-12).map(p => parseFloat(p.amount_paid));
-    const labels = dataPoints.map((_, i) => `Client ${i + 1}`);
+    const labels = payments.slice(-12).map(p => new Date(p.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
 
     // Create a vertical gradient fill
     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
@@ -998,25 +1084,42 @@ window.loadFinanceDashboard = async function() {
         supabaseClient.from('payments').select('*'),
         supabaseClient.from('expenses').select('*'),
         supabaseClient.from('clients').select('id, full_name, created_at'),
-        supabaseClient.from('activity_logs').select('*').eq('event_type', 'Payment').order('created_at', { ascending: false }).limit(20)
+        supabaseClient.from('activity_logs').select('*').eq('event_type', 'Payment').order('created_at', { ascending: false })
     ]);
 
-    const payments = paymentsRes.data || [];
-    const expenses = expensesRes.data || [];
-    const clients = clientsRes.data || [];
-    const paymentLogs = logsRes.data || [];
+    _allPaymentsCached = paymentsRes.data || [];
+    _allExpensesCached = expensesRes.data || [];
+    _allClientsCached = clientsRes.data || [];
+    _allLogsCached = logsRes.data || [];
+
+    const { start, end } = getDashboardDateRange();
+
+    const filteredPayments = filterDataByDate(_allPaymentsCached, 'created_at', start, end);
+    const filteredExpenses = filterDataByDate(_allExpensesCached, 'created_at', start, end);
+    const filteredLogs = filterDataByDate(_allLogsCached, 'created_at', start, end);
+
+    // Prepare revenue data from logs
+    const revenueEntries = filteredLogs.map(log => {
+        const amountMatch = log.description.match(/KES ([\d,.]+)/);
+        return {
+            amount_paid: amountMatch ? parseFloat(amountMatch[1].replace(/,/g, '')) : 0,
+            created_at: log.created_at,
+            client_id: log.client_id
+        };
+    });
 
     // 2. Calculate Stat Cards
     let totalRevenue = 0;
     let totalExpenses = 0;
     let totalProjected = 0;
 
-    payments.forEach(p => {
-        totalRevenue += parseFloat(p.amount_paid || 0);
+    revenueEntries.forEach(r => totalRevenue += r.amount_paid);
+
+    filteredPayments.forEach(p => {
         totalProjected += parseFloat(p.total_amount_due || 0);
     });
 
-    expenses.forEach(e => {
+    filteredExpenses.forEach(e => {
         totalExpenses += parseFloat(e.amount || 0);
     });
 
@@ -1032,14 +1135,14 @@ window.loadFinanceDashboard = async function() {
     const elOut = document.getElementById('finance-page-outstanding');
     if (elOut) elOut.innerText = `KES ${outstanding.toLocaleString()}`;
 
-    // 3. Render Cashflow Chart (Line Chart over months)
-    renderCashflowChart(payments, expenses, clients);
+    // 3. Render Cashflow Chart
+    renderCashflowChart(revenueEntries, filteredExpenses, _allClientsCached);
 
     // 4. Render Expense Doughnut Chart
-    renderPremiumExpenseDoughnut(expenses);
+    renderPremiumExpenseDoughnut(filteredExpenses);
 
     // 5. Populate Transactions Table (Individual Logs)
-    populateRecentFinanceTransactions(paymentLogs, clients);
+    populateRecentFinanceTransactions(filteredLogs, _allClientsCached);
 };
 
 function renderCashflowChart(payments, expenses, clients) {
@@ -1058,13 +1161,9 @@ function renderCashflowChart(payments, expenses, clients) {
         expenseData.push(0);
     }
 
-    const clientMap = {};
-    clients.forEach(c => clientMap[c.id] = c.created_at);
-
     payments.forEach(p => {
-        const dateRaw = clientMap[p.client_id] || p.created_at;
-        if (!dateRaw || !p.amount_paid) return;
-        const d = new Date(dateRaw);
+        if (!p.created_at || !p.amount_paid) return;
+        const d = new Date(p.created_at);
         
         const monthDiff = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
         if (monthDiff >= 0 && monthDiff <= 5) {
