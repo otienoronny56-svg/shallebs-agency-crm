@@ -30,14 +30,14 @@
             </div>
 
             <ul class="nav-links">
-                <li class="active" onclick="showSection('dashboard-section')">
+                <li class="active" onclick="showSection('tasks-section')">
+                    <i class="fas fa-tasks"></i> <span>Daily Tasks</span>
+                </li>
+                <li onclick="showSection('dashboard-section')">
                     <i class="fas fa-th-large"></i> <span>Dashboard</span>
                 </li>
                 <li onclick="showSection('add-client-section')">
                     <i class="fas fa-user-plus"></i> <span>Add Client</span>
-                </li>
-                <li onclick="showSection('tasks-section')">
-                    <i class="fas fa-tasks"></i> <span>Daily Tasks</span>
                 </li>
                 <li onclick="showSection('database-section')">
                     <i class="fas fa-database"></i> <span>Client Database</span>
@@ -95,7 +95,7 @@
                 </div>
             </header>
 
-            <div id="dashboard-section" class="section" style="padding-top: 5px;">
+            <div id="dashboard-section" class="section" style="padding-top: 5px; display: none;">
                 <div class="dashboard-header-flex" style="margin-bottom: 20px;">
                     <div class="greeting-container">
                         <h1 id="dashboard-greeting" style="font-size: 1.5rem; margin-bottom: 4px;">Agency Command Center</h1>
@@ -577,7 +577,7 @@
                 </div>
             </div>
 
-            <div id="tasks-section" class="section" style="display:none;">
+            <div id="tasks-section" class="section">
                 <div class="section-header">
                     <div>
                         <h1>Active Follow-ups</h1>

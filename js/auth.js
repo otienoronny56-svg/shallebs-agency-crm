@@ -77,10 +77,14 @@ window.showSection = function(sectionId) {
     });
 
     // Load tasks when tasks-section is shown
-    if (sectionId === 'tasks-section') {
-        loadAllTasks();
+    } else if (sectionId === 'tasks-section') {
+        if (typeof window.loadAllTasks === 'function') {
+            window.loadAllTasks();
+        }
     } else if (sectionId === 'dashboard-section') {
-        loadDashboardStats();
+        if (typeof window.loadDashboardStats === 'function') {
+            window.loadDashboardStats();
+        }
         if (typeof window.loadFinanceDashboard === 'function') {
             window.loadFinanceDashboard();
         }
@@ -280,22 +284,8 @@ checkUser().then(() => {
     const isDashboard = currentPath.includes('index.html') || currentPath === '/' || currentPath.endsWith('/shallebs-agency/');
     
     if (isDashboard) {
-        if (typeof window.loadDashboardStats === 'function') {
-            window.loadDashboardStats();
-            if (typeof window.loadFinanceDashboard === 'function') {
-                window.loadFinanceDashboard();
-            }
-        } else {
-            // Wait for finance.js to be ready then load
-            window.addEventListener('load', () => {
-                if (typeof window.loadDashboardStats === 'function') {
-                    window.loadDashboardStats();
-                }
-                if (typeof window.loadFinanceDashboard === 'function') {
-                    window.loadFinanceDashboard();
-                }
-            });
-        }
+        // Default to Daily Tasks as requested
+        window.showSection('tasks-section');
     }
 });
 
