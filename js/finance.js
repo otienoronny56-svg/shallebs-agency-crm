@@ -698,17 +698,23 @@ window.generateReceipt = function(clientName, amount, balance) {
                 }
 
                 .header {
-                    display: flex;
-                    justify-content: flex-end;
+                    display: block;
                     border-bottom: 2px solid #add8e6;
                     padding-bottom: 15px;
                     margin-bottom: 30px;
                 }
 
+                .header-top {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: baseline;
+                    margin-bottom: 5px;
+                }
 
-
-                .agency-info {
-                    text-align: right;
+                .header-bottom {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
                 }
 
                 .agency-info h1 {
@@ -722,7 +728,7 @@ window.generateReceipt = function(clientName, amount, balance) {
                     color: #add8e6;
                     font-size: 14px;
                     font-weight: 500;
-                    margin-top: 5px;
+                    text-align: left;
                 }
 
                 .receipt-meta {
@@ -730,11 +736,12 @@ window.generateReceipt = function(clientName, amount, balance) {
                 }
 
                 .receipt-meta h2 {
-                    font-size: 28px;
-                    color: var(--text);
+                    font-size: 26px;
+                    color: #333;
                     text-transform: uppercase;
-                    letter-spacing: 2px;
-                    margin-bottom: 10px;
+                    font-weight: 800;
+                    margin: 0;
+                    letter-spacing: 1px;
                 }
 
                 .meta-table {
@@ -896,29 +903,35 @@ window.generateReceipt = function(clientName, amount, balance) {
             
             <div class="a4-container">
                 <div class="header">
-                    <div class="agency-info">
-                        <h1>
-                            <span style="color: #add8e6;">SHALLEBS</span> 
-                            <span style="color: #fb8c00;">TRAVEL AGENCY</span>
-                        </h1>
+                    <div class="header-top">
+                        <div class="agency-info">
+                            <h1>
+                                <span style="color: #add8e6;">SHALLEBS</span> 
+                                <span style="color: #fb8c00;">TRAVEL AGENCY</span>
+                            </h1>
+                        </div>
+                        <div class="receipt-meta">
+                            <h2>RECEIPT</h2>
+                        </div>
+                    </div>
+                    <div class="header-bottom">
                         <div class="agency-details">
                             <p>HAZINA TOWERS 16<sup>TH</sup> FLOOR</p>
                             <p>TELL: 0722 418 493</p>
                             <p>info@shallebstravelagency.co.ke</p>
                         </div>
-                    </div>
-                    <div class="receipt-meta">
-                        <h2>Receipt</h2>
-                        <table class="meta-table">
-                            <tr>
-                                <th>No:</th>
-                                <td>${receiptNo}</td>
-                            </tr>
-                            <tr>
-                                <th>Date:</th>
-                                <td>${today}</td>
-                            </tr>
-                        </table>
+                        <div class="receipt-meta-details">
+                            <table class="meta-table">
+                                <tr>
+                                    <th>No:</th>
+                                    <td>${receiptNo}</td>
+                                </tr>
+                                <tr>
+                                    <th>Date:</th>
+                                    <td>${today}</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
