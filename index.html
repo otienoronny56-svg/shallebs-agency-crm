@@ -31,23 +31,21 @@
                 <li onclick="showSection('add-client-section')">
                     <i class="fas fa-user-plus"></i> <span>Add Client</span>
                 </li>
+                <li onclick="showSection('tasks-section')">
+                    <i class="fas fa-tasks"></i> <span>Daily Tasks</span>
+                </li>
                 <li onclick="showSection('database-section')">
                     <i class="fas fa-database"></i> <span>Client Database</span>
                 </li>
                 <li onclick="showSection('workers-section')">
-                    <i class="fas fa-id-badge"></i> <span>Workers</span>
+                    <i class="fas fa-id-badge"></i> <span>Employees</span>
                 </li>
                 <li onclick="showSection('finance-section')">
                     <i class="fas fa-wallet"></i> <span>Finance</span>
                 </li>
-                <li onclick="showSection('transactions-section')">
-                    <i class="fas fa-file-invoice-dollar"></i> <span>Transaction Log</span>
-                </li>
+
                 <li onclick="showSection('expenses-section')">
                     <i class="fas fa-receipt"></i> <span>Expenses</span>
-                </li>
-                <li onclick="showSection('tasks-section')">
-                    <i class="fas fa-tasks"></i> <span>Daily Tasks</span>
                 </li>
                 <li onclick="showSection('profile-section')">
                     <i class="fas fa-user-circle"></i> <span>My Profile</span>
@@ -306,6 +304,9 @@
 
             <div id="transactions-section" class="section" style="display:none;">
                 <div class="section-header">
+                    <button onclick="showSection('finance-section')" class="btn-back" style="margin-right: 15px; background: #f1f5f9; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: #1e293b; font-weight: 600;">
+                        <i class="fas fa-arrow-left"></i> Back to Finance
+                    </button>
                     <h1>Global Transaction Log</h1>
                     <div style="display:flex; align-items:center; gap:12px; margin-left:auto;">
                         <div class="search-box">
@@ -467,8 +468,8 @@
                                 <input type="text" id="passport_number" required placeholder="Enter passport no.">
                             </div>
                             <div class="form-group modern">
-                                <label><i class="far fa-calendar-alt"></i> Passport Expiry Date</label>
-                                <input type="date" id="passport_expiry" required>
+                                <label><i class="far fa-calendar-check"></i> Registration Date</label>
+                                <input type="date" id="registration_date" required>
                             </div>
                             <div class="form-group modern">
                                 <label><i class="fas fa-plane-departure"></i> Destination</label>
@@ -572,8 +573,13 @@
 
             <div id="tasks-section" class="section" style="display:none;">
                 <div class="section-header">
-                    <h1>Active Follow-ups</h1>
-                    <p>Things that need to be done today.</p>
+                    <div>
+                        <h1>Active Follow-ups</h1>
+                        <p>Things that need to be done today.</p>
+                    </div>
+                    <button class="btn-action-primary" onclick="openQuickTaskModal()" style="margin-left: auto;">
+                        <i class="fas fa-plus-circle"></i> Create New Task
+                    </button>
                 </div>
 
                 <div class="stats-grid command-center-stats" style="margin-bottom: 25px;">
@@ -583,7 +589,7 @@
                             <span>Active Tasks</span>
                         </div>
                         <p id="stat-active-tasks" class="animate-count">0</p>
-                        <small>Currently pending</small>
+                        <small id="stat-active-subtitle">Currently pending</small>
                     </div>
                     <div class="stat-card premium-pending counter-card" style="border-left-color: #d32f2f;">
                         <div class="stat-header">
@@ -604,6 +610,14 @@
                 </div>
 
                 <div class="table-container">
+                    <div class="filter-bar" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
+                        <div class="filter-group">
+                            <label style="font-size: 0.85rem; font-weight: 600; color: #64748b;">Created By:</label>
+                            <select id="task-creator-filter" onchange="loadAllTasks()" class="clean-select" style="padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                                <option value="All">All Users</option>
+                            </select>
+                        </div>
+                    </div>
                     <table id="tasksTable">
                         <thead>
                             <tr>
@@ -611,6 +625,7 @@
                                 <th>Destination</th>
                                 <th>Action Required</th>
                                 <th>Due Date</th>
+                                <th>Recorded By</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -622,19 +637,19 @@
 
             <div id="workers-section" class="section" style="display:none;">
                 <div class="section-header">
-                    <h1>Worker Management</h1>
+                    <h1>Employee Management</h1>
                     <p>Manage agency staff and assign them to client documentation.</p>
                 </div>
                 
                 <div class="form-card-container" style="margin-top: 20px;">
                     <form id="worker-form" class="modern-client-form">
-                        <div class="form-section-title">Add New Worker</div>
+                        <div class="form-section-title">Add New Employee</div>
                         <div class="form-grid" style="grid-template-columns: 1fr auto; align-items: end;">
                             <div class="form-group modern" style="margin-bottom: 0;">
                                 <label><i class="fas fa-user-tie"></i> Full Name</label>
                                 <input type="text" id="worker_full_name" required placeholder="e.g. Calleb">
                             </div>
-                            <button type="submit" class="btn-submit-modern" style="margin-bottom: 0;"><i class="fas fa-plus"></i> Add Worker</button>
+                            <button type="submit" class="btn-submit-modern" style="margin-bottom: 0;"><i class="fas fa-plus"></i> Add Employee</button>
                         </div>
                     </form>
                 </div>
@@ -643,7 +658,7 @@
                     <table class="shallebs-table">
                         <thead>
                             <tr>
-                                <th>Worker Name</th>
+                                <th>Employee Name</th>
                                 <th>Date Added</th>
                                 <th>Active Workload</th>
                                 <th>Total Assigned</th>
@@ -651,7 +666,7 @@
                             </tr>
                         </thead>
                         <tbody id="workers-body">
-                            <tr><td colspan="3" style="text-align:center; padding: 20px;">Loading workers...</td></tr>
+                            <tr><td colspan="3" style="text-align:center; padding: 20px;">Loading employees...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -687,7 +702,7 @@
     <div id="worker-workload-modal" class="modal" style="display:none;">
         <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
-                <h2><i class="fas fa-tasks"></i> Worker Workload: <span id="workload-worker-name"></span></h2>
+                <h2><i class="fas fa-tasks"></i> Employee Workload: <span id="workload-worker-name"></span></h2>
                 <span class="close-modal" onclick="document.getElementById('worker-workload-modal').style.display='none'">&times;</span>
             </div>
             
@@ -721,6 +736,33 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <!-- Quick Task Modal -->
+    <div id="quick-task-modal" class="modal" style="display:none;">
+        <div class="modal-content small-modal">
+            <div class="modal-header">
+                <h2>Create Quick Task</h2>
+                <span class="close-modal" onclick="document.getElementById('quick-task-modal').style.display='none'">&times;</span>
+            </div>
+            <form id="quick-task-form" class="shallebs-form">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Assign to Client</label>
+                    <select id="qt-client-select" required class="clean-select" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <option value="">Loading clients...</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Task Description</label>
+                    <input type="text" id="qt-desc" required placeholder="e.g. Call regarding passport" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Due Date</label>
+                    <input type="date" id="qt-date" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                </div>
+                <button type="submit" class="btn-save" style="width: 100%; padding: 12px; background: #1a237e; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Save Task</button>
+            </form>
         </div>
     </div>
 

@@ -390,25 +390,42 @@ function renderDestinationHeatmap(clients) {
     if (!ctx) return;
 
     const counts = {};
-    clients.forEach(c => counts[c.destination_country] = (counts[c.destination_country] || 0) + 1);
+    clients.forEach(c => {
+        const dest = c.destination_country || 'Unknown';
+        counts[dest] = (counts[dest] || 0) + 1;
+    });
     
-    // Sort and take top 5
-    const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 5);
+    // Sort by count descending
+    const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
 
     if (window.myHeatmapChart instanceof Chart) window.myHeatmapChart.destroy();
+    
+    // Dynamic color generation (cycling through a premium palette)
+    const basePalette = ['#1a237e', '#0288d1', '#2e7d32', '#f57c00', '#c62828', '#673ab7', '#009688', '#ffc107', '#ff5722', '#795548'];
+    const backgroundColors = sorted.map((_, i) => basePalette[i % basePalette.length]);
+
     window.myHeatmapChart = new Chart(ctx, {
         type: 'polarArea',
         data: {
-            labels: sorted.map(s => s[0] || 'Unknown'),
+            labels: sorted.map(s => s[0]),
             datasets: [{
                 data: sorted.map(s => s[1]),
-                backgroundColor: ['#1a237e', '#0288d1', '#2e7d32', '#f57c00', '#c62828']
+                backgroundColor: backgroundColors
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'right' } }
+            plugins: { 
+                legend: { 
+                    position: 'right',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 10,
+                        font: { size: 11, family: 'Plus Jakarta Sans' }
+                    }
+                } 
+            }
         }
     });
 }

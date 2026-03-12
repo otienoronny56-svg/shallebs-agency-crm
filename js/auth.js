@@ -17,14 +17,14 @@ if (clientForm) {
         const full_name = document.getElementById('full_name').value;
         const phone_number = document.getElementById('phone_number').value;
         const passport_number = document.getElementById('passport_number').value;
-        const passport_expiry = document.getElementById('passport_expiry').value;
+        const registration_date = document.getElementById('registration_date').value;
         const gender = document.getElementById('gender').value;
         const destination_country = document.getElementById('destination').value;
 
         // the clients table uses a column named destination_country (and has a status field)
         const { data, error } = await supabaseClient
             .from('clients')
-            .insert([{ full_name, phone_number, passport_number, passport_expiry, gender, destination_country, status: 'new' }]);
+            .insert([{ full_name, phone_number, passport_number, registration_date, gender, destination_country, status: 'new' }]);
 
         if (error) {
             console.error('Error saving client:', error);
@@ -63,8 +63,16 @@ window.showSection = function(sectionId) {
     // 3. Update Sidebar Active Class
     document.querySelectorAll('.nav-links li').forEach(li => {
         li.classList.remove('active');
-        if (li.getAttribute('onclick') && li.getAttribute('onclick').includes(sectionId)) {
-            li.classList.add('active');
+        const onclick = li.getAttribute('onclick');
+        if (onclick) {
+            // Highlight current section
+            if (onclick.includes(sectionId)) {
+                li.classList.add('active');
+            }
+            // Also highlight Finance if we are in Transactions
+            if (sectionId === 'transactions-section' && onclick.includes('finance-section')) {
+                li.classList.add('active');
+            }
         }
     });
 

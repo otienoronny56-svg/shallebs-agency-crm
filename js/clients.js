@@ -64,7 +64,7 @@ async function fetchClients() {
                 <td>
                     <span style="color:#64748b; font-size:0.85rem;">
                         <i class="fas fa-calendar-alt" style="margin-right:4px; color:#94a3b8;"></i>
-                        ${client.created_at ? new Date(client.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—'}
+                        ${client.registration_date ? new Date(client.registration_date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : (client.created_at ? new Date(client.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—')}
                     </span>
                 </td>
                 <td>
@@ -500,11 +500,11 @@ window.assignWorkerToClient = async function() {
         // Update local object so it persists if tab is switched
         currentClientData.assigned_worker = assignmentString;
         
-        alert(assignmentString ? `Assigned to ${assignmentString}` : "Worker unassigned");
-        logActivity(currentClientId, 'Worker Assignment', assignmentString ? `Assigned to ${assignmentString}` : "Worker unassigned");
+        alert(assignmentString ? `Assigned to ${assignmentString}` : "Employee unassigned");
+        logActivity(currentClientId, 'Employee Assignment', assignmentString ? `Assigned to ${assignmentString}` : "Employee unassigned");
         fetchClients(); // Refresh the main table to show the badge
     } catch (err) {
         console.error("Failed to assign worker", err);
-        alert("Failed to assign worker. Please try again.");
+        alert("Failed to assign employee. Please try again.");
     }
 };

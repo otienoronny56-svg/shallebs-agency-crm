@@ -34,7 +34,7 @@ async function fetchWorkers() {
         window._allWorkers = workers;
 
         if (workers.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">No workers found. Add one above.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">No employees found. Add one above.</td></tr>';
             return;
         }
 
@@ -83,7 +83,7 @@ async function fetchWorkers() {
         }).join('');
     } catch (err) {
         console.error("Failed to fetch workers:", err);
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: red;">Failed to load workers. Check console.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: red;">Failed to load employees. Check console.</td></tr>';
     }
 }
 
@@ -187,7 +187,7 @@ window.assignClientFromModal = async function() {
 };
 
 window.completeWorkerTask = async function(clientId, currentStatus) {
-    if(!confirm("Mark this phase as completed by the worker and move status forward?")) return;
+    if(!confirm("Mark this phase as completed by the employee and move status forward?")) return;
 
     // Determine next naive status (this can be made more robust later)
     let nextStatus = currentStatus;
@@ -207,7 +207,7 @@ window.completeWorkerTask = async function(clientId, currentStatus) {
         
         // Log activity wrapper
         if (window.logActivity) {
-            await window.logActivity('Worker progress logged', `${currentWorkerForModal} completed task. Moved to ${nextStatus}.`);
+            await window.logActivity('Employee progress logged', `${currentWorkerForModal} completed task. Moved to ${nextStatus}.`);
         }
         
         openWorkloadModal(currentWorkerForModal);
@@ -233,15 +233,15 @@ async function addWorker(e) {
         
         nameInput.value = '';
         fetchWorkers();
-        alert('Worker added successfully!');
+        alert('Employee added successfully!');
     } catch (err) {
         console.error("Failed to add worker:", err);
-        alert('Failed to add worker. See console for details.');
+        alert('Failed to add employee. See console for details.');
     }
 }
 
 window.deleteWorker = async function(id, name) {
-    if (!confirm(`Are you sure you want to remove worker: ${name}?`)) return;
+    if (!confirm(`Are you sure you want to remove employee: ${name}?`)) return;
 
     try {
         const { error } = await supabaseClient
@@ -253,6 +253,6 @@ window.deleteWorker = async function(id, name) {
         fetchWorkers();
     } catch (err) {
         console.error("Failed to delete worker:", err);
-        alert('Failed to remove worker.');
+        alert('Failed to remove employee.');
     }
 };
