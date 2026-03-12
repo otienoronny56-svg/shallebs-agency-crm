@@ -700,24 +700,35 @@ window.generateReceipt = function(clientName, amount, balance) {
                 .header {
                     display: flex;
                     justify-content: space-between;
-                    align-items: flex-start;
+                    align-items: center;
                     border-bottom: 2px solid var(--primary);
-                    padding-bottom: 30px;
+                    padding-bottom: 25px;
                     margin-bottom: 40px;
+                }
+
+                .logo-container img {
+                    width: 100px;
+                    height: auto;
+                    display: block;
+                }
+
+                .agency-info {
+                    flex-grow: 1;
+                    margin-left: 25px;
                 }
 
                 .agency-info h1 {
                     color: var(--primary);
-                    font-size: 28px;
+                    font-size: 22px;
                     font-weight: 800;
-                    margin-bottom: 8px;
+                    margin-bottom: 4px;
                     letter-spacing: -0.5px;
                 }
 
                 .agency-details {
                     color: var(--text-light);
-                    font-size: 13px;
-                    line-height: 1.6;
+                    font-size: 12px;
+                    line-height: 1.5;
                 }
 
                 .receipt-meta {
@@ -725,7 +736,7 @@ window.generateReceipt = function(clientName, amount, balance) {
                 }
 
                 .receipt-meta h2 {
-                    font-size: 32px;
+                    font-size: 28px;
                     color: var(--text);
                     text-transform: uppercase;
                     letter-spacing: 2px;
@@ -736,13 +747,15 @@ window.generateReceipt = function(clientName, amount, balance) {
                     margin-left: auto;
                     border-collapse: collapse;
                 }
+
                 .meta-table th {
                     text-align: right;
-                    padding: 4px 15px 4px 0;
+                    padding: 2px 10px 2px 0;
                     color: var(--text-light);
                     font-size: 13px;
                     font-weight: 500;
                 }
+
                 .meta-table td {
                     text-align: right;
                     font-size: 13px;
@@ -760,14 +773,15 @@ window.generateReceipt = function(clientName, amount, balance) {
                 }
 
                 .client-info h3 {
-                    font-size: 13px;
+                    font-size: 12px;
                     color: var(--text-light);
                     text-transform: uppercase;
                     letter-spacing: 1px;
                     margin-bottom: 8px;
                 }
+
                 .client-info p {
-                    font-size: 18px;
+                    font-size: 17px;
                     font-weight: 700;
                     color: var(--primary);
                 }
@@ -780,23 +794,27 @@ window.generateReceipt = function(clientName, amount, balance) {
                     width: 100%;
                     border-collapse: collapse;
                 }
+
                 .invoice-table th {
                     background: var(--primary);
                     color: white;
-                    padding: 15px;
+                    padding: 14px;
                     text-align: left;
-                    font-size: 13px;
+                    font-size: 12px;
                     text-transform: uppercase;
                     letter-spacing: 1px;
                 }
+
                 .invoice-table th:last-child {
                     text-align: right;
                 }
+
                 .invoice-table td {
-                    padding: 20px 15px;
+                    padding: 18px 14px;
                     border-bottom: 1px solid var(--border);
-                    font-size: 15px;
+                    font-size: 14px;
                 }
+
                 .invoice-table td:last-child {
                     text-align: right;
                     font-weight: 600;
@@ -809,26 +827,30 @@ window.generateReceipt = function(clientName, amount, balance) {
                 }
 
                 .totals-table {
-                    width: 350px;
+                    width: 320px;
                     border-collapse: collapse;
                 }
+
                 .totals-table td {
-                    padding: 12px 15px;
-                    font-size: 15px;
+                    padding: 10px 14px;
+                    font-size: 14px;
                 }
+
                 .totals-table td:nth-child(1) {
                     color: var(--text-light);
                     font-weight: 500;
                 }
+
                 .totals-table td:nth-child(2) {
                     text-align: right;
                     font-weight: 700;
                 }
+
                 .totals-table tr.total-row td {
                     border-top: 2px solid var(--primary);
-                    font-size: 18px;
+                    font-size: 17px;
                     color: var(--primary);
-                    padding-top: 20px;
+                    padding-top: 18px;
                 }
 
                 .footer {
@@ -839,11 +861,11 @@ window.generateReceipt = function(clientName, amount, balance) {
                     border-top: 1px solid var(--border);
                     padding-top: 20px;
                     text-align: center;
-                    font-size: 12px;
+                    font-size: 11px;
                     color: var(--text-light);
                 }
 
-                .footer p { margin-bottom: 5px; }
+                .footer p { margin-bottom: 4px; }
                 .footer strong { color: var(--text); }
 
                 .print-btn {
@@ -853,15 +875,17 @@ window.generateReceipt = function(clientName, amount, balance) {
                     background: var(--primary);
                     color: white;
                     border: none;
-                    padding: 15px 30px;
+                    padding: 14px 28px;
                     border-radius: 50px;
-                    font-size: 16px;
+                    font-size: 15px;
                     font-weight: 600;
                     cursor: pointer;
                     box-shadow: 0 4px 15px rgba(26,35,126,0.3);
                     transition: transform 0.2s;
                     font-family: inherit;
+                    z-index: 1000;
                 }
+
                 .print-btn:hover { transform: translateY(-2px); }
 
                 @media print {
@@ -878,31 +902,32 @@ window.generateReceipt = function(clientName, amount, balance) {
             
             <div class="a4-container">
                 <div class="header">
-                    <div class="header-left">
-                        <!-- Logo Placement (Moved above title to save horizontal/vertical clash) -->
-                        <img src="logo.png" alt="Shallebs Logo" style="height: 60px; object-fit: contain; margin-bottom: 12px; display: block;" onerror="this.style.display='none'">
-                        
-                        <div class="agency-info">
-                            <h1 style="font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 5px; letter-spacing: -0.5px;">SHALLEBS AGENCY</h1>
-                            <div class="agency-details" style="font-size: 12px; color: var(--text-light); line-height: 1.5;">
-                                16th Floor, Hazina Towers<br>
-                                Utalii Street, Nairobi, Kenya<br>
-                                Phone: 0722 418 493 / 0722 543 551<br>
-                                Email: info@shallebstravelagency.co.ke
-                            </div>
+                    <div class="logo-container">
+                        <img src="logo.jpg" alt="Shallebs Agency Logo">
+                    </div>
+                    <div class="agency-info">
+                        <h1>
+                            <span style="color: #039be5;">SHALLEBS</span> 
+                            <span style="color: #fb8c00;">TRAVEL AGENCY</span>
+                        </h1>
+                        <p style="font-size: 11px; color: #039be5; font-style: italic; margin-bottom: 10px; margin-top: -5px;">"....explore the new World with us"</p>
+                        <div class="agency-details">
+                            <p>16th Floor, Hazina Towers</p>
+                            <p>Utalii Street, Nairobi, Kenya</p>
+                            <p>Phone: 0722 418 493 / 0722 543 551</p>
+                            <p>Email: info@shallebstravelagency.co.ke</p>
                         </div>
                     </div>
-                    
-                    <div class="receipt-meta" style="text-align: right;">
-                        <h2 style="font-size: 26px; color: var(--text); letter-spacing: 1px; margin-bottom: 15px;">RECEIPT</h2>
-                        <table class="meta-table" style="margin-left: auto; border-collapse: collapse;">
+                    <div class="receipt-meta">
+                        <h2>Receipt</h2>
+                        <table class="meta-table">
                             <tr>
-                                <th style="text-align: right; padding: 4px 15px 4px 0; color: var(--text-light); font-size: 13px; font-weight: 500;">Receipt No:</th>
-                                <td style="text-align: right; font-size: 13px; font-weight: 600;">${receiptNo}</td>
+                                <th>No:</th>
+                                <td>${receiptNo}</td>
                             </tr>
                             <tr>
-                                <th style="text-align: right; padding: 4px 15px 4px 0; color: var(--text-light); font-size: 13px; font-weight: 500;">Date Issued:</th>
-                                <td style="text-align: right; font-size: 13px; font-weight: 600;">${today}</td>
+                                <th>Date:</th>
+                                <td>${today}</td>
                             </tr>
                         </table>
                     </div>
@@ -915,7 +940,7 @@ window.generateReceipt = function(clientName, amount, balance) {
                     </div>
                     <div class="client-info" style="text-align: right;">
                         <h3>Payment Method</h3>
-                        <p style="color: var(--text); font-size: 15px; font-weight: 500;">Cash / Bank Transfer</p>
+                        <p style="color: var(--text); font-size: 14px; font-weight: 500;">Cash / Bank Transfer</p>
                     </div>
                 </div>
 
@@ -931,7 +956,7 @@ window.generateReceipt = function(clientName, amount, balance) {
                             <tr>
                                 <td>
                                     <strong>Consultation & Agency Services</strong><br>
-                                    <span style="color: var(--text-light); font-size: 13px; margin-top: 4px; display: inline-block;">Payment towards travel facilitation, visa processing, and agency handling fees.</span>
+                                    <span style="color: var(--text-light); font-size: 12px; margin-top: 4px; display: inline-block;">Payment towards travel facilitation, visa processing, and agency handling fees.</span>
                                 </td>
                                 <td>KES ${parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                             </tr>
@@ -955,7 +980,7 @@ window.generateReceipt = function(clientName, amount, balance) {
                 <div class="footer">
                     <p><strong>Thank you for choosing Shallebs Travel Agency!</strong></p>
                     <p>This is a computer-generated receipt and signature is not required.</p>
-                    <p style="margin-top: 10px; font-size: 11px;">If you have any questions regarding this receipt, please contact us at info@shallebstravelagency.co.ke</p>
+                    <p style="margin-top: 8px; font-size: 10px;">If you have any questions regarding this receipt, please contact us at info@shallebstravelagency.co.ke</p>
                 </div>
             </div>
         </body>
