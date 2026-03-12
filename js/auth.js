@@ -229,20 +229,48 @@ function loadUserProfile(user) {
         tasksSub.innerText = `Focus on your priorities! Here are your active follow-ups for today.`;
     }
 
-    // Update Profile Section
-    const profileName = document.getElementById('profile-name');
-    const profileEmail = document.getElementById('profile-email');
+    // Update Profile Card (Read-only labels)
+    const viewName = document.getElementById('view-profile-name');
+    const viewEmail = document.getElementById('view-profile-email');
+    const labelPhone = document.getElementById('label-profile-phone');
+    const labelPassport = document.getElementById('label-profile-passport');
+    const labelId = document.getElementById('label-profile-id');
+    const labelCreated = document.getElementById('label-profile-created');
     const profileAvatar = document.getElementById('profile-avatar');
-    const profilePhone = document.getElementById('profile-phone');
-    const profilePassport = document.getElementById('profile-passport');
-    const profileId = document.getElementById('profile-id');
-    
-    if (profileName) profileName.value = nameStr;
-    if (profileEmail) profileEmail.value = user.email;
+
+    if (viewName) viewName.innerText = nameStr;
+    if (viewEmail) viewEmail.innerText = user.email;
     if (profileAvatar) profileAvatar.src = avatarUrl;
-    if (profilePhone) profilePhone.value = user.user_metadata?.phone || '';
-    if (profilePassport) profilePassport.value = user.user_metadata?.passport_no || '';
-    if (profileId) profileId.value = user.user_metadata?.id_no || '';
+    if (labelPhone) labelPhone.innerText = user.user_metadata?.phone || 'Not Set';
+    if (labelPassport) labelPassport.innerText = user.user_metadata?.passport_no || 'Not Set';
+    if (labelId) labelId.innerText = user.user_metadata?.id_no || 'Not Set';
+    
+    if (labelCreated && user.created_at) {
+        const date = new Date(user.created_at);
+        labelCreated.innerText = `Managing since ${date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
+    }
+
+    // Pre-fill Edit Modal Inputs
+    const profileNameInput = document.getElementById('profile-name');
+    const profilePhoneInput = document.getElementById('profile-phone');
+    const profilePassportInput = document.getElementById('profile-passport');
+    const profileIdInput = document.getElementById('profile-id');
+    
+    if (profileNameInput) profileNameInput.value = nameStr;
+    if (profilePhoneInput) profilePhoneInput.value = user.user_metadata?.phone || '';
+    if (profilePassportInput) profilePassportInput.value = user.user_metadata?.passport_no || '';
+    if (profileIdInput) profileIdInput.value = user.user_metadata?.id_no || '';
+}
+
+// --- Admin Profile Modal Controls ---
+window.openAdminProfileModal = function() {
+    const modal = document.getElementById('admin-profile-modal');
+    if (modal) modal.style.display = 'flex';
+}
+
+window.closeAdminProfileModal = function() {
+    const modal = document.getElementById('admin-profile-modal');
+    if (modal) modal.style.display = 'none';
 }
 
 
@@ -254,13 +282,13 @@ document.getElementById('profile-form')?.addEventListener('submit', async (e) =>
     const newPassport = document.getElementById('profile-passport').value;
     const newId = document.getElementById('profile-id').value;
 
-    const btn = e.target.querySelector('button');
+    const btn = e.target.querySelector('button[type="submit"]');
     const originalText = btn.innerHTML;
     
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
     btn.disabled = true;
 
-    const { data, error } = await supabaseClient.auth.updateUser({
+    const { data: { user }, error } = await supabaseClient.auth.updateUser({
         data: { 
             full_name: newName,
             phone: newPhone,
@@ -276,7 +304,8 @@ document.getElementById('profile-form')?.addEventListener('submit', async (e) =>
         alert('Error updating profile: ' + error.message);
     } else {
         alert('Profile updated successfully!');
-        loadUserProfile(data.user); // Refresh UI
+        closeAdminProfileModal();
+        if (user) loadUserProfile(user); // Refresh UI
     }
 });
 

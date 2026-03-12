@@ -428,53 +428,67 @@
             <div id="profile-section" class="section" style="display:none;">
                 <div class="section-header">
                     <h1>Admin Profile</h1>
-                    <p>Manage your account settings and profile picture.</p>
+                    <p>Your agency identity and account credentials.</p>
                 </div>
 
                 <div class="profile-container">
-                    <div class="profile-card">
-                        <div class="avatar-upload-container">
-                            <div class="avatar-preview">
+                    <div class="profile-view-card">
+                        <div class="profile-card-header">
+                            <div class="profile-avatar-wrapper">
                                 <img id="profile-avatar" src="https://ui-avatars.com/api/?name=Admin&background=1a237e&color=fff&size=120" alt="Avatar">
-                                <div class="avatar-overlay" onclick="document.getElementById('avatar-upload').click()">
+                                <button class="avatar-edit-badge" onclick="document.getElementById('avatar-upload').click()">
                                     <i class="fas fa-camera"></i>
-                                    <span>Change</span>
-                                </div>
+                                </button>
+                                <input type="file" id="avatar-upload" style="display:none;" accept="image/*" onchange="uploadAvatar(event)">
                             </div>
-                            <input type="file" id="avatar-upload" style="display:none;" accept="image/*" onchange="uploadAvatar(event)">
+                            <div class="profile-primary-info">
+                                <h2 id="view-profile-name">Admin User</h2>
+                                <p id="view-profile-email">admin@shallebs.co.ke</p>
+                                <span class="admin-badge"><i class="fas fa-shield-alt"></i> System Administrator</span>
+                            </div>
+                            <button class="btn-edit-profile" onclick="openAdminProfileModal()">
+                                <i class="fas fa-user-edit"></i> Edit Profile
+                            </button>
                         </div>
                         
-                        <form id="profile-form" class="shallebs-form" style="max-width: 100%; box-shadow: none; padding: 0; margin-top: 30px;">
-                            <div class="form-section-title" style="margin-bottom: 20px;">Personal Details</div>
-                            <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
-                                <div class="form-group">
-                                    <label><i class="fas fa-user"></i> Full Display Name</label>
-                                    <input type="text" id="profile-name" required placeholder="Loading...">
-                                </div>
-                                <div class="form-group">
-                                    <label><i class="fas fa-phone-alt"></i> Phone Number</label>
-                                    <input type="text" id="profile-phone" placeholder="e.g. +254 7...">
-                                </div>
-                                <div class="form-group">
-                                    <label><i class="fas fa-passport"></i> Passport Number</label>
-                                    <input type="text" id="profile-passport" placeholder="Enter passport no.">
-                                </div>
-                                <div class="form-group">
-                                    <label><i class="fas fa-id-card"></i> National ID Number</label>
-                                    <input type="text" id="profile-id" placeholder="Enter ID no.">
+                        <div class="profile-info-grid">
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
+                                <div class="info-details">
+                                    <label>Phone Number</label>
+                                    <span id="label-profile-phone">Not Set</span>
                                 </div>
                             </div>
-
-                            <div class="form-divider" style="margin: 25px 0;"></div>
-                            <div class="form-group">
-                                <label><i class="fas fa-envelope"></i> Email Address (Read-only)</label>
-                                <input type="email" id="profile-email" readonly style="background: #f1f5f9; cursor: not-allowed;" title="Email cannot be changed here">
-                                <small style="color: #64748b; margin-top: 5px; display: block;">Contact technical support to change primary login email.</small>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fas fa-passport"></i></div>
+                                <div class="info-details">
+                                    <label>Passport Number</label>
+                                    <span id="label-profile-passport">Not Set</span>
+                                </div>
                             </div>
-                            <button type="submit" class="btn-save" style="margin-top: 20px; width: auto; padding: 12px 30px;">
-                                <i class="fas fa-save"></i> Save Profile Updates
-                            </button>
-                        </form>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fas fa-id-card"></i></div>
+                                <div class="info-details">
+                                    <label>National ID Number</label>
+                                    <span id="label-profile-id">Not Set</span>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fas fa-calendar-alt"></i></div>
+                                <div class="info-details">
+                                    <label>Account Created</label>
+                                    <span id="label-profile-created">Managing since 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="security-notice-card">
+                        <div class="notice-icon"><i class="fas fa-lock"></i></div>
+                        <div class="notice-text">
+                            <h4>Security & Privacy</h4>
+                            <p>Your personal data is encrypted and used only for internal agency documentation and facilitation. Only you can view or edit these details.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -828,6 +842,40 @@
     <script src="js/finance.js"></script>
     <script src="js/tasks.js"></script>
     <script src="js/workers.js"></script>
+    <!-- Admin Profile Edit Modal -->
+    <div id="admin-profile-modal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width: 600px; height: auto;">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-edit"></i> Edit Admin Profile</h2>
+                <span class="close-modal" onclick="closeAdminProfileModal()">&times;</span>
+            </div>
+            <form id="profile-form" class="modern-client-form" style="padding: 30px;">
+                <div class="form-grid" style="grid-template-columns: 1fr; gap: 15px;">
+                    <div class="form-group modern">
+                        <label><i class="fas fa-user"></i> Full Name</label>
+                        <input type="text" id="profile-name" required placeholder="Display Name">
+                    </div>
+                    <div class="form-group modern">
+                        <label><i class="fas fa-phone-alt"></i> Phone Number</label>
+                        <input type="text" id="profile-phone" placeholder="+254 7...">
+                    </div>
+                    <div class="form-group modern">
+                        <label><i class="fas fa-passport"></i> Passport Number</label>
+                        <input type="text" id="profile-passport" placeholder="Passport No.">
+                    </div>
+                    <div class="form-group modern">
+                        <label><i class="fas fa-id-card"></i> National ID Number</label>
+                        <input type="text" id="profile-id" placeholder="ID No.">
+                    </div>
+                </div>
+                
+                <div class="form-actions" style="margin-top: 25px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                    <button type="button" class="btn-cancel" onclick="closeAdminProfileModal()">Cancel</button>
+                    <button type="submit" class="btn-submit-modern"><i class="fas fa-save"></i> Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 
 </html>
