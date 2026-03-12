@@ -445,16 +445,35 @@
                         </div>
                         
                         <form id="profile-form" class="shallebs-form" style="max-width: 100%; box-shadow: none; padding: 0; margin-top: 30px;">
-                            <div class="form-group">
-                                <label>Display Name</label>
-                                <input type="text" id="profile-name" required placeholder="Loading...">
+                            <div class="form-section-title" style="margin-bottom: 20px;">Personal Details</div>
+                            <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label><i class="fas fa-user"></i> Full Display Name</label>
+                                    <input type="text" id="profile-name" required placeholder="Loading...">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-phone-alt"></i> Phone Number</label>
+                                    <input type="text" id="profile-phone" placeholder="e.g. +254 7...">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-passport"></i> Passport Number</label>
+                                    <input type="text" id="profile-passport" placeholder="Enter passport no.">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-id-card"></i> National ID Number</label>
+                                    <input type="text" id="profile-id" placeholder="Enter ID no.">
+                                </div>
                             </div>
+
+                            <div class="form-divider" style="margin: 25px 0;"></div>
                             <div class="form-group">
-                                <label>Email Address</label>
+                                <label><i class="fas fa-envelope"></i> Email Address (Read-only)</label>
                                 <input type="email" id="profile-email" readonly style="background: #f1f5f9; cursor: not-allowed;" title="Email cannot be changed here">
                                 <small style="color: #64748b; margin-top: 5px; display: block;">Contact technical support to change primary login email.</small>
                             </div>
-                            <button type="submit" class="btn-save" style="margin-top: 20px;">Save Profile Updates</button>
+                            <button type="submit" class="btn-save" style="margin-top: 20px; width: auto; padding: 12px 30px;">
+                                <i class="fas fa-save"></i> Save Profile Updates
+                            </button>
                         </form>
                     </div>
                 </div>

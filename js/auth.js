@@ -233,28 +233,43 @@ function loadUserProfile(user) {
     const profileName = document.getElementById('profile-name');
     const profileEmail = document.getElementById('profile-email');
     const profileAvatar = document.getElementById('profile-avatar');
+    const profilePhone = document.getElementById('profile-phone');
+    const profilePassport = document.getElementById('profile-passport');
+    const profileId = document.getElementById('profile-id');
     
     if (profileName) profileName.value = nameStr;
     if (profileEmail) profileEmail.value = user.email;
     if (profileAvatar) profileAvatar.src = avatarUrl;
+    if (profilePhone) profilePhone.value = user.user_metadata?.phone || '';
+    if (profilePassport) profilePassport.value = user.user_metadata?.passport_no || '';
+    if (profileId) profileId.value = user.user_metadata?.id_no || '';
 }
 
 
-// Handle Profile Form Submission (Name update)
+// Handle Profile Form Submission (Updates name, phone, passport, id)
 document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const newName = document.getElementById('profile-name').value;
+    const newPhone = document.getElementById('profile-phone').value;
+    const newPassport = document.getElementById('profile-passport').value;
+    const newId = document.getElementById('profile-id').value;
+
     const btn = e.target.querySelector('button');
-    const originalText = btn.innerText;
+    const originalText = btn.innerHTML;
     
-    btn.innerText = 'Saving...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
     btn.disabled = true;
 
     const { data, error } = await supabaseClient.auth.updateUser({
-        data: { full_name: newName }
+        data: { 
+            full_name: newName,
+            phone: newPhone,
+            passport_no: newPassport,
+            id_no: newId
+        }
     });
 
-    btn.innerText = originalText;
+    btn.innerHTML = originalText;
     btn.disabled = false;
 
     if (error) {
