@@ -81,12 +81,11 @@ window.showSection = function(sectionId) {
         loadAllTasks();
     } else if (sectionId === 'dashboard-section') {
         loadDashboardStats();
-    } else if (sectionId === 'expenses-section') {
-        loadExpenseDashboard();
-    } else if (sectionId === 'finance-section') {
         if (typeof window.loadFinanceDashboard === 'function') {
             window.loadFinanceDashboard();
         }
+    } else if (sectionId === 'expenses-section') {
+        loadExpenseDashboard();
     } else if (sectionId === 'transactions-section') {
         if (typeof window.loadAllTransactions === 'function') {
             window.loadAllTransactions();

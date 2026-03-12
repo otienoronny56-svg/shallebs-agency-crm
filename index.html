@@ -45,11 +45,9 @@
                 <li onclick="showSection('workers-section')">
                     <i class="fas fa-id-badge"></i> <span>Employees</span>
                 </li>
-                <li onclick="showSection('finance-section')">
-                    <i class="fas fa-wallet"></i> <span>Finance</span>
-                </li>
-
                 <li onclick="showSection('expenses-section')">
+                    <i class="fas fa-receipt"></i> <span>Expenses</span>
+                </li>
                     <i class="fas fa-receipt"></i> <span>Expenses</span>
                 </li>
                 <li onclick="showSection('profile-section')">
@@ -98,221 +96,115 @@
                 </div>
             </header>
 
-            <div id="dashboard-section" class="section">
-                <div class="dashboard-header-flex">
-                    <h1 id="dashboard-greeting">Agency Command Center</h1>
-                    <div class="live-status-pill">
-                        <span class="pulse-dot"></span> Live Agency Data
-                    </div>
-                </div>
-                
-                <div class="stats-grid command-center-stats">
-                    <div class="stat-card premium-finance counter-card">
-                        <div class="stat-header">
-                            <i class="fas fa-coins"></i>
-                            <span>Total Revenue</span>
-                        </div>
-                        <p id="stat-revenue" class="animate-count">KES 0</p>
-                        <small>Payments received</small>
-                    </div>
-                    <div class="stat-card premium-pending counter-card">
-                        <div class="stat-header">
-                            <i class="fas fa-clock"></i>
-                            <span>Projected Revenue</span>
-                        </div>
-                        <p id="stat-projected" class="animate-count">KES 0</p>
-                        <small>Outstanding balances</small>
-                    </div>
-                    <div class="stat-card premium-tasks counter-card">
-                        <div class="stat-header">
-                            <i class="fas fa-user-check"></i>
-                            <span>Visa Success</span>
-                        </div>
-                        <p id="stat-success-rate">98%</p>
-                        <small>Historical average</small>
-                    </div>
-                    <div class="stat-card premium-profit counter-card">
-                        <div class="stat-header">
-                            <i class="fas fa-users"></i>
-                            <span>New Clients</span>
-                        </div>
-                        <p id="stat-new-clients" class="animate-count">0</p>
-                        <small>This month</small>
-                    </div>
-                    <div class="stat-card premium-expenses counter-card">
-                        <div class="stat-header">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Avg. Charge</span>
-                        </div>
-                        <p id="stat-avg-charge" class="animate-count">KES 0</p>
-                        <small>Per client average</small>
-                    </div>
-                    <div class="stat-card" style="border-left-color: #7b1fa2;">
-                        <div class="stat-header">
-                            <i class="fas fa-percentage" style="color:#7b1fa2;"></i>
-                            <span>Collection Rate</span>
-                        </div>
-                        <p id="stat-collection-rate" style="color:#7b1fa2;">0%</p>
-                        <small>Paid vs. total due</small>
-                    </div>
                 </div>
 
-                <!-- Revenue Trend Chart with Filters -->
-                <div class="chart-container-main" style="margin-bottom: 25px;">
-                    <div class="chart-top-bar">
-                        <h3><i class="fas fa-chart-line"></i> Revenue Trend</h3>
-                        <div class="chart-filter-bar">
-                            <button class="chart-filter-btn active" onclick="updateRevenueTrend('monthly', this)">Monthly</button>
-                            <button class="chart-filter-btn" onclick="updateRevenueTrend('quarterly', this)">Quarterly</button>
-                            <button class="chart-filter-btn" onclick="updateRevenueTrend('yearly', this)">Yearly</button>
+                <!-- Merged Finance Section -->
+                <div class="merged-finance-container" style="margin-top: 40px; padding-top: 40px; border-top: 2px solid #e2e8f0;">
+                    <div class="section-header">
+                        <h1 style="font-size: 1.8rem; color: #1e293b; margin-bottom: 8px;">Finance Overview</h1>
+                        <p style="color: #64748b;">Track your agency's financial health, profit, and latest revenue.</p>
+                        <div class="export-btn-group" style="margin-left: auto;">
+                            <button class="export-btn" onclick="exportFinancePDF()">
+                                <i class="fas fa-file-pdf"></i> Export PDF
+                            </button>
+                            <button class="export-btn export-btn-excel" onclick="exportFinanceExcel()">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </button>
                         </div>
                     </div>
-                    <canvas id="revenueTrendChart"></canvas>
-                </div>
 
-                <div class="command-center-layout">
-                    <div class="main-analytics">
-                        <div class="dashboard-charts-row">
-                        <div class="chart-container-main">
-                            <div class="chart-top-bar">
-                                <h3><i class="fas fa-filter"></i> Application Pipeline</h3>
-                            </div>
-                            <canvas id="pipelineFunnelChart"></canvas>
-                        </div>
-                        </div>
-                        <div class="dashboard-charts-row">
-                            <div class="chart-container-half">
-                                <h3><i class="fas fa-chart-line"></i> Performance Trend</h3>
-                                <canvas id="financeGrowthChart"></canvas>
-                            </div>
-                            <div class="chart-container-half">
-                                <div class="chart-top-bar">
-                                    <h3><i class="fas fa-map-marker-alt"></i> Destination Heatmap</h3>
+                    <div class="finance-stats-grid">
+                        <div class="finance-stat-card">
+                            <div class="finance-stat-top">
+                                <div class="finance-icon" style="background: #e8f5e9; color: #4caf50;">
+                                    <i class="fas fa-arrow-down"></i>
                                 </div>
-                                <canvas id="destinationHeatmapChart"></canvas>
+                                <span class="trend-pill trend-up"><i class="fas fa-arrow-up"></i> +12.5%</span>
+                            </div>
+                            <p class="finance-stat-title">Total Revenue</p>
+                            <h2 id="finance-page-revenue">KES 0</h2>
+                        </div>
+                        
+                        <div class="finance-stat-card">
+                            <div class="finance-stat-top">
+                                <div class="finance-icon" style="background: #ffebee; color: #f44336;">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                                <span class="trend-pill trend-down"><i class="fas fa-arrow-down"></i> -2.4%</span>
+                            </div>
+                            <p class="finance-stat-title">Total Expenses</p>
+                            <h2 id="finance-page-expenses">KES 0</h2>
+                        </div>
+
+                        <div class="finance-stat-card">
+                            <div class="finance-stat-top">
+                                <div class="finance-icon" style="background: #e3f2fd; color: #2196f3;">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <span class="trend-pill trend-up"><i class="fas fa-arrow-up"></i> +5.1%</span>
+                            </div>
+                            <p class="finance-stat-title">Net Profit</p>
+                            <h2 id="finance-page-profit">KES 0</h2>
+                        </div>
+
+                        <div class="finance-stat-card">
+                            <div class="finance-stat-top">
+                                <div class="finance-icon" style="background: #fff3e0; color: #ff9800;">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                            <p class="finance-stat-title">Outstanding Balance</p>
+                            <h2 id="finance-page-outstanding">KES 0</h2>
+                        </div>
+                    </div>
+
+                    <div class="finance-charts-layout">
+                        <div class="finance-chart-main">
+                            <div class="chart-top-bar">
+                                <h3>Cashflow Overview</h3>
+                                <select id="cashflow-filter" class="clean-select">
+                                    <option>Last 12 Months</option>
+                                    <option>Last 30 Days</option>
+                                </select>
+                            </div>
+                            <canvas id="financeCashflowChart" height="250"></canvas>
+                        </div>
+                        
+                        <div class="finance-chart-side">
+                            <div class="chart-top-bar">
+                                <h3>Expense Breakdown</h3>
+                            </div>
+                            <div class="doughnut-container">
+                                <canvas id="financeExpenseDoughnut" height="250"></canvas>
                             </div>
                         </div>
                     </div>
 
-                    <div class="global-activity-sidebar">
-                        <h3><i class="fas fa-history"></i> Agency Live Feed</h3>
-                        <div id="global-activity-feed" class="activity-feed">
-                            <div class="loader-inner">Fetching logs...</div>
+                    <div class="finance-bottom-layout">
+                        <div class="finance-transactions">
+                            <div class="chart-top-bar">
+                                <h3>Recent Transactions</h3>
+                                <button class="btn-text" onclick="showSection('transactions-section')">View All <i class="fas fa-chevron-right"></i></button>
+                            </div>
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th>Client Name</th>
+                                        <th>Payment Date</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="finance-recent-transactions">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="finance-section" class="section" style="display:none;">
-                <div class="section-header">
-                    <h1>Finance Overview</h1>
-                    <p>Track your agency's financial health, profit, and latest revenue.</p>
-                    <div class="export-btn-group" style="margin-left: auto;">
-                        <button class="export-btn" onclick="exportFinancePDF()">
-                            <i class="fas fa-file-pdf"></i> Export PDF
-                        </button>
-                        <button class="export-btn export-btn-excel" onclick="exportFinanceExcel()">
-                            <i class="fas fa-file-excel"></i> Export Excel
-                        </button>
-                    </div>
-                </div>
 
-                <div class="finance-stats-grid">
-                    <div class="finance-stat-card">
-                        <div class="finance-stat-top">
-                            <div class="finance-icon" style="background: #e8f5e9; color: #4caf50;">
-                                <i class="fas fa-arrow-down"></i>
-                            </div>
-                            <span class="trend-pill trend-up"><i class="fas fa-arrow-up"></i> +12.5%</span>
-                        </div>
-                        <p class="finance-stat-title">Total Revenue</p>
-                        <h2 id="finance-page-revenue">KES 0</h2>
-                    </div>
-                    
-                    <div class="finance-stat-card">
-                        <div class="finance-stat-top">
-                            <div class="finance-icon" style="background: #ffebee; color: #f44336;">
-                                <i class="fas fa-arrow-up"></i>
-                            </div>
-                            <span class="trend-pill trend-down"><i class="fas fa-arrow-down"></i> -2.4%</span>
-                        </div>
-                        <p class="finance-stat-title">Total Expenses</p>
-                        <h2 id="finance-page-expenses">KES 0</h2>
-                    </div>
-
-                    <div class="finance-stat-card">
-                        <div class="finance-stat-top">
-                            <div class="finance-icon" style="background: #e3f2fd; color: #2196f3;">
-                                <i class="fas fa-wallet"></i>
-                            </div>
-                            <span class="trend-pill trend-up"><i class="fas fa-arrow-up"></i> +5.1%</span>
-                        </div>
-                        <p class="finance-stat-title">Net Profit</p>
-                        <h2 id="finance-page-profit">KES 0</h2>
-                    </div>
-
-                    <div class="finance-stat-card">
-                        <div class="finance-stat-top">
-                            <div class="finance-icon" style="background: #fff3e0; color: #ff9800;">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                        </div>
-                        <p class="finance-stat-title">Outstanding Balance</p>
-                        <h2 id="finance-page-outstanding">KES 0</h2>
-                    </div>
-                </div>
-
-                <div class="finance-charts-layout">
-                    <div class="finance-chart-main">
-                        <div class="chart-top-bar">
-                            <h3>Cashflow Overview</h3>
-                            <select id="cashflow-filter" class="clean-select">
-                                <option>Last 12 Months</option>
-                                <option>Last 30 Days</option>
-                            </select>
-                        </div>
-                        <canvas id="financeCashflowChart" height="250"></canvas>
-                    </div>
-                    
-                    <div class="finance-chart-side">
-                        <div class="chart-top-bar">
-                            <h3>Expense Breakdown</h3>
-                        </div>
-                        <div class="doughnut-container">
-                            <canvas id="financeExpenseDoughnut" height="250"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="finance-bottom-layout">
-                    <div class="finance-transactions">
-                        <div class="chart-top-bar">
-                            <h3>Recent Transactions</h3>
-                            <button class="btn-text" onclick="showSection('transactions-section')">View All <i class="fas fa-chevron-right"></i></button>
-                        </div>
-                        <table class="premium-table">
-                            <thead>
-                                <tr>
-                                    <th>Client Name</th>
-                                    <th>Payment Date</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="finance-recent-transactions">
-                                <!-- Populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="transactions-section" class="section" style="display:none;">
-                <div class="section-header">
-                    <button onclick="showSection('finance-section')" class="btn-back" style="margin-right: 15px; background: #f1f5f9; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: #1e293b; font-weight: 600;">
-                        <i class="fas fa-arrow-left"></i> Back to Finance
-                    </button>
-                    <h1>Global Transaction Log</h1>
                     <div style="display:flex; align-items:center; gap:12px; margin-left:auto;">
                         <div class="search-box">
                             <input type="text" id="transactionSearch" placeholder="Search client name..." onkeyup="filterTransactions()">
