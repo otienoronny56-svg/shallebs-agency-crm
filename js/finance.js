@@ -994,15 +994,17 @@ window.generateReceipt = function(clientName, amount, balance) {
 // --- Premium Finance Dashboard Logic ---
 window.loadFinanceDashboard = async function() {
     // 1. Fetch Data
-    const [paymentsRes, expensesRes, clientsRes] = await Promise.all([
+    const [paymentsRes, expensesRes, clientsRes, logsRes] = await Promise.all([
         supabaseClient.from('payments').select('*'),
         supabaseClient.from('expenses').select('*'),
-        supabaseClient.from('clients').select('id, full_name, created_at')
+        supabaseClient.from('clients').select('id, full_name, created_at'),
+        supabaseClient.from('activity_logs').select('*').eq('event_type', 'Payment').order('created_at', { ascending: false }).limit(20)
     ]);
 
     const payments = paymentsRes.data || [];
     const expenses = expensesRes.data || [];
     const clients = clientsRes.data || [];
+    const paymentLogs = logsRes.data || [];
 
     // 2. Calculate Stat Cards
     let totalRevenue = 0;
@@ -1036,8 +1038,8 @@ window.loadFinanceDashboard = async function() {
     // 4. Render Expense Doughnut Chart
     renderPremiumExpenseDoughnut(expenses);
 
-    // 5. Populate Transactions Table
-    populateRecentFinanceTransactions(payments, clients);
+    // 5. Populate Transactions Table (Individual Logs)
+    populateRecentFinanceTransactions(paymentLogs, clients);
 };
 
 function renderCashflowChart(payments, expenses, clients) {
@@ -1161,85 +1163,91 @@ function renderPremiumExpenseDoughnut(expenses) {
     });
 }
 
-function populateRecentFinanceTransactions(payments, clients) {
+function populateRecentFinanceTransactions(paymentLogs, clients) {
     const tbody = document.getElementById('finance-recent-transactions');
     if (!tbody) return;
 
     const clientMap = {};
     clients.forEach(c => clientMap[c.id] = c.full_name);
 
-    const validPayments = payments.filter(p => parseFloat(p.amount_paid) > 0);
-    
-    tbody.innerHTML = validPayments.slice(0, 5).map(p => {
-        const clientName = clientMap[p.client_id] || 'Unknown Client';
-        const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    tbody.innerHTML = paymentLogs.slice(0, 5).map(log => {
+        const clientName = clientMap[log.client_id] || 'Unknown Client';
+        const dateStr = new Date(log.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        
+        // Extract amount from description "Installment of KES 500 recorded."
+        const amountMatch = log.description.match(/KES ([\d,.]+)/);
+        const amountDisplay = amountMatch ? `KES ${amountMatch[1]}` : log.description;
         
         return `
             <tr>
                 <td><strong>${clientName}</strong></td>
                 <td><small style="color:#94a3b8;"><i class="fas fa-calendar-alt"></i> ${dateStr}</small></td>
-                <td style="color: #4caf50; font-weight: bold;">+ KES ${parseFloat(p.amount_paid).toLocaleString()}</td>
-                <td><span style="background: #e8f5e9; color: #4caf50; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Completed</span></td>
+                <td style="color: #4caf50; font-weight: bold;">+ ${amountDisplay}</td>
+                <td><span style="background: #e8f5e9; color: #4caf50; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Installment</span></td>
             </tr>
         `;
     }).join('');
     
-    if (validPayments.length === 0) {
+    if (paymentLogs.length === 0) {
         tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 30px;">No recent transactions found.</td></tr>`;
     }
 }
 
 // --- Global Transaction Logger Logic ---
 window.loadAllTransactions = async function() {
-    const [paymentsRes, clientsRes] = await Promise.all([
-        supabaseClient.from('payments').select('*'),
-        supabaseClient.from('clients').select('id, full_name, created_at')
+    const [logsRes, clientsRes, paymentsRes] = await Promise.all([
+        supabaseClient.from('activity_logs').select('*').eq('event_type', 'Payment').order('created_at', { ascending: false }),
+        supabaseClient.from('clients').select('id, full_name, created_at'),
+        supabaseClient.from('payments').select('*')
     ]);
 
-    const payments = paymentsRes.data || [];
+    const logs = logsRes.data || [];
     const clients = clientsRes.data || [];
+    const payments = paymentsRes.data || [];
 
-    // Filter to only payments > 0
-    const allTransactions = payments.filter(p => parseFloat(p.amount_paid) > 0);
-
-    // Sort newest first
-    allTransactions.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-
-    window._allTransactions = allTransactions; // Cache for searching
+    window._allLogs = logs;
     window._allClients = clients;
+    window._allFinalPayments = payments; // For balance calc in receipts
 
-    populateAllTransactionsTable(allTransactions);
+    populateAllTransactionsTable(logs);
 };
 
-function populateAllTransactionsTable(transactions) {
+function populateAllTransactionsTable(logs) {
     const tbody = document.getElementById('all-transactions-body');
     if (!tbody) return;
 
     const clients = window._allClients || [];
+    const finalPayments = window._allFinalPayments || [];
     const clientMap = {};
     clients.forEach(c => clientMap[c.id] = c.full_name);
+    
+    const balanceMap = {};
+    finalPayments.forEach(p => {
+        balanceMap[p.client_id] = Math.max(0, parseFloat(p.total_amount_due) - parseFloat(p.amount_paid));
+    });
 
-    tbody.innerHTML = transactions.map(p => {
-        const clientName = clientMap[p.client_id] || 'Unknown Client';
-        const dateRaw = p.created_at || clientMap[p.client_id]?.created_at;
-        const dateStr = dateRaw ? new Date(dateRaw).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Unknown Date';
-        const amount = parseFloat(p.amount_paid);
-        const balance = Math.max(0, parseFloat(p.total_amount_due) - amount);
+    tbody.innerHTML = logs.map(log => {
+        const clientName = clientMap[log.client_id] || 'Unknown Client';
+        const dateStr = new Date(log.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        
+        const amountMatch = log.description.match(/KES ([\d,.]+)/);
+        const amountVal = amountMatch ? parseFloat(amountMatch[1].replace(/,/g, '')) : 0;
+        const currentBalance = balanceMap[log.client_id] || 0;
         
         return `
             <tr class="transaction-row">
                 <td class="tx-client-name"><strong>${clientName}</strong></td>
                 <td><small style="color:#94a3b8;"><i class="fas fa-calendar-alt"></i> ${dateStr}</small></td>
-                <td style="color: #4caf50; font-weight: bold;">+ KES ${amount.toLocaleString()}</td>
+                <td style="color: #4caf50; font-weight: bold;">+ KES ${amountVal.toLocaleString()}</td>
                 <td>
-                    <span style="background: #e8f5e9; color: #4caf50; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-right: 10px;">Logged</span>
-                    <button onclick="generateReceipt('${clientName.replace(/'/g, "\\'")}', ${amount}, ${balance})" class="btn-text" style="font-size: 0.8rem;"><i class="fas fa-file-invoice"></i> Receipt</button>
+                    <span style="background: #e8f5e9; color: #4caf50; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-right: 10px;">Installment</span>
+                    <button onclick="generateReceipt('${clientName.replace(/'/g, "\\'")}', ${amountVal}, ${currentBalance})" class="btn-text" style="font-size: 0.8rem;"><i class="fas fa-file-invoice"></i> Receipt</button>
                 </td>
             </tr>
         `;
     }).join('');
     
-    if (transactions.length === 0) {
+    if (logs.length === 0) {
         tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 40px;">No transactions found in the system.</td></tr>`;
     }
 }

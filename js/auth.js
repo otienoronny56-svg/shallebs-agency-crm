@@ -179,6 +179,10 @@ function loadUserProfile(user) {
     if (greetingEl) {
         greetingEl.innerHTML = `${greeting}, ${firstName} <span style="font-size: 0.9em; margin-left: 6px;">${emoji}</span>`;
     }
+    const subGreeting = document.getElementById('dashboard-sub-greeting');
+    if (subGreeting) {
+        subGreeting.innerText = `Welcome back! Here's your agency's financial overview for today.`;
+    }
 
     // Update Profile Section
     const profileName = document.getElementById('profile-name');
