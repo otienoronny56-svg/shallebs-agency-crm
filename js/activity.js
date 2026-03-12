@@ -20,11 +20,24 @@ window.logActivity = async function(clientId, type, desc) {
 };
 
 window.fetchActivity = async function(clientId) {
-    const { data, error } = await supabase
-        .from('activity_logs')
-        .select('*')
-        .eq('client_id', clientId)
-        .order('created_at', { ascending: false });
+    // Fetch both logs and current payment info (for balance) in parallel
+    const [logsRes, paymentRes] = await Promise.all([
+        supabase
+            .from('activity_logs')
+            .select('*')
+            .eq('client_id', clientId)
+            .order('created_at', { ascending: false }),
+        supabase
+            .from('payments')
+            .select('amount_paid, total_amount_due')
+            .eq('client_id', clientId)
+            .single()
+    ]);
+
+    const data = logsRes.data;
+    const payment = paymentRes.data;
+    const currentBalance = payment ? Math.max(0, parseFloat(payment.total_amount_due) - parseFloat(payment.amount_paid)) : 0;
+    const clientName = document.getElementById('detail-name')?.innerText || 'Client';
 
     const list = document.getElementById('activity-list');
     if (list) {
@@ -32,13 +45,29 @@ window.fetchActivity = async function(clientId) {
         if (!data) return;
         data.forEach(log => {
             const date = new Date(log.created_at).toLocaleString();
+            const isPayment = log.event_type.toLowerCase().includes('payment');
+            
+            let actionHtml = '';
+            if (isPayment) {
+                const amountMatch = log.description.match(/KES ([\d,.]+)/);
+                const amountVal = amountMatch ? parseFloat(amountMatch[1].replace(/,/g, '')) : 0;
+                actionHtml = `
+                    <button onclick="generateReceipt('${clientName.replace(/'/g, "\\'")}', ${amountVal}, ${currentBalance})" class="btn-text" style="font-size: 0.75rem; margin-top: 5px; color: #1a237e;">
+                        <i class="fas fa-file-invoice"></i> Generate Receipt
+                    </button>
+                `;
+            }
+
             list.innerHTML += `
                 <div class="activity-item" style="padding: 8px; border-bottom: 1px solid #eee; font-size: 0.85rem;">
                     <p style="margin: 0;">
                         <span style="color: #1a237e; font-weight: bold;">[${date}]</span> 
                         <strong>${log.event_type}:</strong> ${log.description}
                     </p>
-                    <small style="color: #666; font-style: italic;">Action by: ${log.agent_email}</small>
+                    ${actionHtml}
+                    <div style="margin-top: 3px;">
+                        <small style="color: #666; font-style: italic;">Action by: ${log.agent_email}</small>
+                    </div>
                 </div>
             `;
         });
