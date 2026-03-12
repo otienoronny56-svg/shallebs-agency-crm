@@ -233,7 +233,7 @@ function loadUserProfile(user) {
     const viewName = document.getElementById('view-profile-name');
     const viewEmail = document.getElementById('view-profile-email');
     const labelPhone = document.getElementById('label-profile-phone');
-    const labelPassport = document.getElementById('label-profile-passport');
+    const labelLogin = document.getElementById('label-profile-login');
     const labelId = document.getElementById('label-profile-id');
     const labelCreated = document.getElementById('label-profile-created');
     const profileAvatar = document.getElementById('profile-avatar');
@@ -242,7 +242,7 @@ function loadUserProfile(user) {
     if (viewEmail) viewEmail.innerText = user.email;
     if (profileAvatar) profileAvatar.src = avatarUrl;
     if (labelPhone) labelPhone.innerText = user.user_metadata?.phone || 'Not Set';
-    if (labelPassport) labelPassport.innerText = user.user_metadata?.passport_no || 'Not Set';
+    if (labelLogin) labelLogin.innerText = user.email || 'admin@shallebs.com';
     if (labelId) labelId.innerText = user.user_metadata?.id_no || 'Not Set';
     
     if (labelCreated && user.created_at) {
@@ -253,12 +253,12 @@ function loadUserProfile(user) {
     // Pre-fill Edit Modal Inputs
     const profileNameInput = document.getElementById('profile-name');
     const profilePhoneInput = document.getElementById('profile-phone');
-    const profilePassportInput = document.getElementById('profile-passport');
+    const profileEmailSync = document.getElementById('profile-email-sync');
     const profileIdInput = document.getElementById('profile-id');
     
     if (profileNameInput) profileNameInput.value = nameStr;
     if (profilePhoneInput) profilePhoneInput.value = user.user_metadata?.phone || '';
-    if (profilePassportInput) profilePassportInput.value = user.user_metadata?.passport_no || '';
+    if (profileEmailSync) profileEmailSync.value = user.email || 'admin@shallebs.com';
     if (profileIdInput) profileIdInput.value = user.user_metadata?.id_no || '';
 }
 
@@ -274,12 +274,11 @@ window.closeAdminProfileModal = function() {
 }
 
 
-// Handle Profile Form Submission (Updates name, phone, passport, id)
+// Handle Profile Form Submission (Updates name, phone, id)
 document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const newName = document.getElementById('profile-name').value;
     const newPhone = document.getElementById('profile-phone').value;
-    const newPassport = document.getElementById('profile-passport').value;
     const newId = document.getElementById('profile-id').value;
 
     const btn = e.target.querySelector('button[type="submit"]');
@@ -292,7 +291,6 @@ document.getElementById('profile-form')?.addEventListener('submit', async (e) =>
         data: { 
             full_name: newName,
             phone: newPhone,
-            passport_no: newPassport,
             id_no: newId
         }
     });

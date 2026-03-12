@@ -460,10 +460,17 @@
                                 </div>
                             </div>
                             <div class="info-item">
-                                <div class="info-icon"><i class="fas fa-passport"></i></div>
+                                <div class="info-icon"><i class="fas fa-envelope"></i></div>
                                 <div class="info-details">
-                                    <label>Passport Number</label>
-                                    <span id="label-profile-passport">Not Set</span>
+                                    <label>Login Email</label>
+                                    <span id="label-profile-login">admin@shallebs.com</span>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fas fa-key"></i></div>
+                                <div class="info-details">
+                                    <label>Security Password</label>
+                                    <span style="color: #94a3b8; font-style: italic;">••••••••</span>
                                 </div>
                             </div>
                             <div class="info-item">
@@ -859,9 +866,15 @@
                         <label><i class="fas fa-phone-alt"></i> Phone Number</label>
                         <input type="text" id="profile-phone" placeholder="+254 7...">
                     </div>
+                    <div class="form-group modern" title="Login email cannot be changed here">
+                        <label><i class="fas fa-envelope"></i> Login Email</label>
+                        <input type="email" id="profile-email-sync" readonly style="background: #f1f5f9; cursor: not-allowed;">
+                        <small style="color: #64748b; margin-top: 5px; display: block;">Primary account email.</small>
+                    </div>
                     <div class="form-group modern">
-                        <label><i class="fas fa-passport"></i> Passport Number</label>
-                        <input type="text" id="profile-passport" placeholder="Passport No.">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" readonly value="********" style="background: #f1f5f9; cursor: not-allowed;" onclick="alert('Password reset feature coming soon!')">
+                        <small style="color: #64748b; margin-top: 5px; display: block;">Feature coming soon.</small>
                     </div>
                     <div class="form-group modern">
                         <label><i class="fas fa-id-card"></i> National ID Number</label>
