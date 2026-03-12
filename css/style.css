@@ -2139,32 +2139,56 @@ canvas {
 }
 
 .security-notice-card {
-    margin-top: 30px;
-    background: #fffbeb;
-    border: 1px solid #fde68a;
-    border-radius: 12px;
-    padding: 20px;
+    margin-top: 40px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 25px;
     display: flex;
-    gap: 15px;
+    gap: 20px;
     align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.security-notice-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #1a237e;
 }
 
 .notice-icon {
-    font-size: 1.5rem;
-    color: #d97706;
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: #1a237e;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    flex-shrink: 0;
 }
 
 .notice-text h4 {
-    color: #92400e;
-    margin-bottom: 3px;
-    font-size: 0.95rem;
+    color: #1e293b;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+    font-weight: 700;
 }
 
 .notice-text p {
-    color: #b45309;
-    font-size: 0.85rem;
-    line-height: 1.5;
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    max-width: 500px;
 }
+
 
 /* Modal Helper Classes */
 .btn-cancel {
