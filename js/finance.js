@@ -1019,7 +1019,7 @@ window.loadFinanceDashboard = async function() {
     });
 
     const netProfit = totalRevenue - totalExpenses;
-    const outstanding = totalProjected - totalRevenue;
+    const outstanding = Math.max(0, totalProjected - totalRevenue);
 
     const elRev = document.getElementById('finance-page-revenue');
     if (elRev) elRev.innerText = `KES ${totalRevenue.toLocaleString()}`;
@@ -1033,12 +1033,8 @@ window.loadFinanceDashboard = async function() {
     // 3. Render Cashflow Chart (Line Chart over months)
     renderCashflowChart(payments, expenses, clients);
 
-    // 4. Render Expense Doughnut Chart using the updated multi-ring design
-    const financeExpenseCtx = document.getElementById('financeExpenseDoughnut')?.getContext('2d');
-    if (financeExpenseCtx) {
-        // Redraw the multi-ring doughnut onto the Finance page canvas
-        renderExpenseChartsToCanvas(financeExpenseCtx, expenses, totalRevenue, totalExpenses);
-    }
+    // 4. Render Expense Doughnut Chart
+    renderPremiumExpenseDoughnut(expenses);
 
     // 5. Populate Transactions Table
     populateRecentFinanceTransactions(payments, clients);

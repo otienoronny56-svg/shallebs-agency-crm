@@ -278,11 +278,17 @@ checkUser().then(() => {
     if (isDashboard) {
         if (typeof window.loadDashboardStats === 'function') {
             window.loadDashboardStats();
+            if (typeof window.loadFinanceDashboard === 'function') {
+                window.loadFinanceDashboard();
+            }
         } else {
             // Wait for finance.js to be ready then load
             window.addEventListener('load', () => {
                 if (typeof window.loadDashboardStats === 'function') {
                     window.loadDashboardStats();
+                }
+                if (typeof window.loadFinanceDashboard === 'function') {
+                    window.loadFinanceDashboard();
                 }
             });
         }
