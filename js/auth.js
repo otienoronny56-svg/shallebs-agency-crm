@@ -115,6 +115,22 @@ document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     }
 });
 
+// Password Visibility Toggle
+document.getElementById('toggle-password')?.addEventListener('click', function() {
+    const passwordInput = document.getElementById('login-password');
+    const eyeIcon = document.getElementById('eye-icon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+    }
+});
+
 // 2. Security Check & Profile Load (Run this on index.html)
 async function checkUser() {
     const { data: { user } } = await supabaseClient.auth.getUser();
